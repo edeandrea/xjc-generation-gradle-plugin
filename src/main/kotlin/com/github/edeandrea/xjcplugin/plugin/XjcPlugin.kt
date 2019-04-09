@@ -15,6 +15,7 @@ class XjcPlugin : Plugin<Project> {
 	}
 
 	override fun apply(project: Project) {
+		project.pluginManager.apply("java")
 		project.configurations.maybeCreate("xjc")
 		project.extensions.create("xjcGeneration", XjcExtension::class.java, project)
 
@@ -53,7 +54,6 @@ class XjcPlugin : Plugin<Project> {
 				val taskDesc = schema.description ?: "Generate sources for the schema file $schemaFile"
 
 				log.info("------------------------------------------")
-				log.info("Configuring new XJC task with details:")
 				log.info("taskName = $taskName")
 				log.info("sourceSetName = $sourceSetName")
 				log.info("schemaDir = $schemaDir")

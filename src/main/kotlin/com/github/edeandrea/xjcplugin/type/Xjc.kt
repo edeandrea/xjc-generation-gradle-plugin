@@ -7,6 +7,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
@@ -26,13 +27,15 @@ open class Xjc : DefaultTask() {
 	lateinit var schemaFile: File
 
 	@InputFile
+	@Optional
 	var bindingFile: File? = null
 
 	@OutputDirectory
 	lateinit var schemaGenDir: File
 
 	@Input
-	var javaPackageName: String? = ""
+	@Optional
+	var javaPackageName: String = ""
 
 	@Internal
 	lateinit var sourceSet: SourceSet
@@ -42,10 +45,6 @@ open class Xjc : DefaultTask() {
 	private fun validateProperties() {
 		if (this.schemaGenDir == null) {
 			throw GradleException("Property 'schemaGenDir' not set on task $name")
-		}
-
-		if (this.bindingFile == null) {
-			throw GradleException("Property 'bindingFile' not set on task $name")
 		}
 
 		if (this.schemaFile == null) {
@@ -77,31 +76,21 @@ open class Xjc : DefaultTask() {
 		}
 
 		val language = if (this.schemaFile.name.endsWith("wsdl")) "WSDL" else "XMLSCHEMA"
+		val optionsMap = mutableMapOf(
+			"destdir" to this.schemaGenDir.absolutePath,
+			"extension" to true,
+			"schema" to schemaFile,
+			"language" to language
+		)
 
-		if ((this.javaPackageName == null) || this.javaPackageName!!.isBlank()) {
-			ant.invokeMethod(
-				"xjc",
-				mapOf(
-					"destdir" to this.schemaGenDir.absolutePath,
-					"binding" to this.bindingFile,
-					"extension" to true,
-					"schema" to this.schemaFile,
-					"language" to language
-				)
-			)
+		if (this.javaPackageName.isNotBlank()) {
+			optionsMap["package"] = this.javaPackageName
 		}
-		else {
-			ant.invokeMethod(
-				"xjc",
-				mapOf(
-					"destdir" to this.schemaGenDir.absolutePath,
-					"binding" to this.bindingFile,
-					"package" to this.javaPackageName,
-					"extension" to true,
-					"schema" to schemaFile,
-					"language" to language
-				)
-			)
+
+		if (this.bindingFile != null) {
+			optionsMap["binding"] = this.bindingFile
 		}
+
+		ant.invokeMethod("xjc", optionsMap)
 	}
 }
