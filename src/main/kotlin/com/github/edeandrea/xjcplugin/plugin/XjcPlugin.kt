@@ -9,6 +9,9 @@ import org.gradle.api.Project
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.SourceSetContainer
 
+/**
+ * The main plugin class
+ */
 class XjcPlugin : Plugin<Project> {
 	companion object {
 		val log = Logging.getLogger(XjcPlugin::class.java)

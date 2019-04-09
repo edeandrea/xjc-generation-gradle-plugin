@@ -13,6 +13,9 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+/**
+ * A task type for performing generation of a single schema
+ */
 open class Xjc : DefaultTask() {
 	companion object {
 		val LOGGER = Logging.getLogger(Xjc::class.java)
@@ -23,20 +26,35 @@ open class Xjc : DefaultTask() {
 		group = "Code Generation"
 	}
 
+	/**
+	 * The schema file
+	 */
 	@InputFile
 	lateinit var schemaFile: File
 
+	/**
+	 * The binding file
+	 */
 	@InputFile
 	@Optional
 	var bindingFile: File? = null
 
+	/**
+	 * The output directory for generation
+	 */
 	@OutputDirectory
 	lateinit var schemaGenDir: File
 
+	/**
+	 * The java package name
+	 */
 	@Input
 	@Optional
 	var javaPackageName: String = ""
 
+	/**
+	 * The [SourceSet]
+	 */
 	@Internal
 	lateinit var sourceSet: SourceSet
 
@@ -52,6 +70,9 @@ open class Xjc : DefaultTask() {
 		}
 	}
 
+	/**
+	 * Generates the sources for the schema
+	 */
 	@TaskAction
 	fun generateSources() {
 		validateProperties()
