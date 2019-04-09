@@ -39,47 +39,44 @@ class XjcPlugin : Plugin<Project> {
 	private fun createTasksFromSchemas(project: Project) {
 		val xjcExtension = project.extensions.getByType(XjcExtension::class.java)
 		val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
-		val schemas = xjcExtension.schemas
 
-		if (!schemas.isEmpty()) {
-			schemas.forEach { schema ->
-				if ((schema.schemaFile == null) || schema.schemaFile.isBlank()) {
-					throw GradleException("Required property 'schemaFile' for schema '${schema.name}' not set")
-				}
-
-				val taskName = getTaskName(schema)
-				val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
-				val sourceSet = sourceSets.getByName(sourceSetName)
-				val schemaDir = project.file("${project.projectDir}/src/$sourceSetName/schemas/xjc")
-				val schemaFile = project.file("$schemaDir/${schema.schemaFile}")
-				val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
-				val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
-				val taskDesc = schema.description ?: "Generate sources for the schema file $schemaFile"
-
-				log.info("------------------------------------------")
-				log.info("taskName = $taskName")
-				log.info("sourceSetName = $sourceSetName")
-				log.info("schemaDir = $schemaDir")
-				log.info("schemaFile = $schemaFile")
-				log.info("generatedSourcesDir = $generatedSourcesDir")
-				log.info("bindingFile = $bindingFile")
-				log.info("taskDesc = $taskDesc")
-				log.info("------------------------------------------")
-
-				sourceSet.java.srcDir(generatedSourcesDir)
-
-				val xjcTask = project.tasks.create(taskName, Xjc::class.java) {
-					it.description = taskDesc
-					it.schemaFile = schemaFile
-					it.javaPackageName = schema.javaPackageName
-					it.sourceSet = sourceSet
-					it.bindingFile = bindingFile
-					it.schemaGenDir = project.file(generatedSourcesDir)
-				}
-
-				val sourceSetNameTaskName = if (sourceSetName == "main") "compileJava" else "compile${sourceSetName.capitalize()}Java"
-				project.tasks.getByName(sourceSetNameTaskName).dependsOn(xjcTask)
+		xjcExtension.schemas?.forEach { schema ->
+			if ((schema.schemaFile == null) || schema.schemaFile.isBlank()) {
+				throw GradleException("Required property 'schemaFile' for schema '${schema.name}' not set")
 			}
+
+			val taskName = getTaskName(schema)
+			val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
+			val sourceSet = sourceSets.getByName(sourceSetName)
+			val schemaDir = project.file("${project.projectDir}/src/$sourceSetName/schemas/xjc")
+			val schemaFile = project.file("$schemaDir/${schema.schemaFile}")
+			val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
+			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
+			val taskDesc = schema.description ?: "Generate sources for the schema file $schemaFile"
+
+			log.info("------------------------------------------")
+			log.info("taskName = $taskName")
+			log.info("sourceSetName = $sourceSetName")
+			log.info("schemaDir = $schemaDir")
+			log.info("schemaFile = $schemaFile")
+			log.info("generatedSourcesDir = $generatedSourcesDir")
+			log.info("bindingFile = $bindingFile")
+			log.info("taskDesc = $taskDesc")
+			log.info("------------------------------------------")
+
+			sourceSet.java.srcDir(generatedSourcesDir)
+
+			val xjcTask = project.tasks.create(taskName, Xjc::class.java) {
+				it.description = taskDesc
+				it.schemaFile = schemaFile
+				it.javaPackageName = schema.javaPackageName
+				it.sourceSet = sourceSet
+				it.bindingFile = bindingFile
+				it.schemaGenDir = project.file(generatedSourcesDir)
+			}
+
+			val sourceSetNameTaskName = if (sourceSetName == "main") "compileJava" else "compile${sourceSetName.capitalize()}Java"
+			project.tasks.getByName(sourceSetNameTaskName).dependsOn(xjcTask)
 		}
 	}
 
