@@ -1,6 +1,8 @@
 plugins {
 	id("com.gradle.plugin-publish") version "0.10.1"
+	id("com.github.kt3k.coveralls") version "2.8.2"
 	`java-gradle-plugin`
+	jacoco
 	kotlin("jvm") version "1.3.21"
 }
 
@@ -38,6 +40,7 @@ repositories {
 dependencies {
 	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("reflect"))
+	testImplementation("org.assertj:assertj-core:3.12.2")
 	testImplementation(kotlin("test-junit5"))
 	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
@@ -45,4 +48,30 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
+
+	reports {
+		junitXml.setOutputPerTestCase(true)
+	}
+}
+
+tasks {
+	test {
+		finalizedBy("jacocoTestReport")
+
+		extensions.configure(JacocoTaskExtension::class) {
+			setDestinationFile(file("$buildDir/coverage-results/jacoco.exec"))
+		}
+	}
+
+	jacocoTestReport {
+		reports {
+			xml.isEnabled = true
+			html.isEnabled = true
+			csv.isEnabled = false
+		}
+	}
+}
+
+coveralls {
+	jacocoReportPath = project.tasks.getByName<JacocoReport>("jacocoTestReport").reports.xml.destination
 }
