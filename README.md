@@ -109,13 +109,13 @@ For this example to work you would have the following filesystem layout
 /
 	src/
 		main/
-			schema/
+			schemas/
 				xjc/
 					maven-4.0/
 						maven-4.0.0.xsd
 					xjc.xjb.xml
 		test/
-			schema/
+			schemas/
 				xjc/
 					some-other-schema-1.0/
 						someschema-1.0.wsdl
