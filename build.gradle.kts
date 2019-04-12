@@ -1,8 +1,6 @@
 plugins {
 	id("com.gradle.plugin-publish") version "0.10.1"
-	id("com.github.kt3k.coveralls") version "2.8.2"
 	`java-gradle-plugin`
-	jacoco
 	kotlin("jvm") version "1.3.21"
 }
 
@@ -52,26 +50,4 @@ tasks.withType<Test>().configureEach {
 	reports {
 		junitXml.setOutputPerTestCase(true)
 	}
-}
-
-tasks {
-	test {
-		finalizedBy("jacocoTestReport")
-
-		extensions.configure(JacocoTaskExtension::class) {
-			setDestinationFile(file("$buildDir/coverage-results/jacoco.exec"))
-		}
-	}
-
-	jacocoTestReport {
-		reports {
-			xml.isEnabled = true
-			html.isEnabled = true
-			csv.isEnabled = false
-		}
-	}
-}
-
-coveralls {
-	jacocoReportPath = project.tasks.getByName<JacocoReport>("jacocoTestReport").reports.xml.destination
 }
