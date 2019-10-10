@@ -16,24 +16,29 @@
 
 package com.github.edeandrea.xjcplugin
 
+import org.gradle.BuildResult
 import org.gradle.api.Project
+import org.gradle.api.internal.GradleInternal
+import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.invocation.Gradle
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import kotlin.test.assertFalse
 
 /**
  * Base test class for unit tests
  * @author Eric Deandrea
  */
-abstract class AbstractUnitTests {
+internal abstract class AbstractUnitTests {
 	@TempDir
-	private lateinit var tempFolder : File
+	internal lateinit var tempFolder : File
 
 	open fun getProject(rootProjectName: String, vararg childProjects: String?) : Project {
 		val projBuilder = ProjectBuilder.builder().withProjectDir(tempFolder)
 		val rootProject = projBuilder.withName(rootProjectName).build()
 
-		if (childProjects != null) {
+		if (childProjects.isNotEmpty()) {
 			childProjects.forEach { childProject ->
 				projBuilder
 					.withName(childProject)
@@ -47,5 +52,62 @@ abstract class AbstractUnitTests {
 		return rootProject
 	}
 
+	fun runProjectBeforeEvaluate(project: Project) {
+		if (project is ProjectInternal) {
+			project.projectEvaluationBroadcaster.beforeEvaluate(project)
+		}
+	}
 
+	fun runProjectAfterEvaluate(project: Project) {
+		if (project is ProjectInternal) {
+			runProjectBeforeEvaluate(project)
+			project.state.toBeforeEvaluate()
+			project.projectEvaluationBroadcaster.afterEvaluate(project, project.state)
+		}
+	}
+
+	fun runGradleProjectsEvaluated(gradle: Gradle) {
+		if (gradle is GradleInternal) {
+			gradle.buildListenerBroadcaster.projectsEvaluated(gradle)
+		}
+	}
+
+	fun runGradleProjectsEvaluated(project: Project) {
+		runGradleProjectsEvaluated(project.gradle)
+	}
+
+	fun runGradleBuildFinished(gradle: Gradle, buildResult: BuildResult) {
+		if (gradle is GradleInternal) {
+			gradle.buildListenerBroadcaster.buildFinished(buildResult)
+		}
+	}
+
+	fun runGradleBuildFinished(project: Project, buildResult: BuildResult) {
+		runGradleBuildFinished(project.gradle, buildResult)
+	}
+
+	protected fun findException(root: Throwable?, clazz: Class<Throwable>) : Throwable? {
+		if (root == null) {
+			assertFalse(false, "Couldn't find exception of type ${clazz.name}")
+		}
+
+		return if (clazz.isInstance(root)) root else findException(root?.cause, clazz)
+	}
+
+	protected fun getExceptionChain(root: Throwable?) : List<Throwable> {
+		val exceptionChain: List<Throwable>
+
+		if (root != null) {
+			exceptionChain = listOf(root).union(getExceptionChain(root.cause)).toList()
+		}
+		else {
+			exceptionChain = emptyList()
+		}
+
+		return exceptionChain
+	}
+
+	protected fun getRootCause(t: Throwable) : Throwable {
+		return getExceptionChain(t).last()
+	}
 }

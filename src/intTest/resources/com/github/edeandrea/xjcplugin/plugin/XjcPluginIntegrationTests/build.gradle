@@ -1,0 +1,38 @@
+plugins {
+	id 'com.github.edeandrea.xjc-generation'
+}
+
+ext {
+	jaxbVersion = '2.2.11'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+	xjc 'javax.activation:activation:1.1.1'
+}
+
+xjcGeneration {
+	defaultBindingFile = file 'src/main/schemas/xjc/xjc.xjb.xml'
+
+	schemas {
+		maven {
+			schemaFile = 'maven-4.0/maven-4.0.xsd'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.maven2'
+			taskName = 'generateMaven2Schema'
+		}
+
+		mavenTest {
+			schemaFile = 'maven-4.0.0/maven-4.0.0.xsd'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.maven'
+			taskName = 'generateMavenSchema'
+			sourceSet = 'test'
+		}
+	}
+}
