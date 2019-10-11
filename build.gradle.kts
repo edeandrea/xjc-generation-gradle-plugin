@@ -45,6 +45,8 @@ gradlePlugin {
 		create("xjcPlugin") {
 			id = "com.github.edeandrea.xjc-generation"
 			implementationClass = "com.github.edeandrea.xjcplugin.plugin.XjcPlugin"
+			displayName = "XJC Generation Plugin"
+			description = "A Gradle Plugin for generating JAXB Java sources using the XJC compiler"
 		}
 	}
 }
@@ -52,14 +54,7 @@ gradlePlugin {
 pluginBundle {
 	website = "http://github.com/edeandrea/xjc-generation-gradle-plugin"
 	vcsUrl = "http://github.com/edeandrea/xjc-generation-gradle-plugin"
-	description = "A Gradle Plugin for generating JAXB Java sources using the XJC compiler"
-
-	(plugins) {
-		"xjcPlugin" {
-			displayName = "XJC Generation Plugin"
-			tags = listOf("xjc", "jaxb")
-		}
-	}
+	tags = listOf("xjc", "jaxb")
 }
 
 idea {
