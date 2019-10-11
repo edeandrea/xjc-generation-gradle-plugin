@@ -11,7 +11,7 @@ You can use the `plugins` closure
 **Groovy**
 ```groovy
 plugins {
-	id 'com.github.edeandrea.xjc-generation' version '1.1'
+  id 'com.github.edeandrea.xjc-generation' version '1.1'
 }
 ```
 
@@ -53,8 +53,8 @@ xjcGeneration {
       bindingFile = null  // Can be either a String or File reference to a binding file to use for this schema. If null or empty, the default binding file will be used.
       description = null  // A description of the schema
       javaPackageName = ""  // The java package to generate the sources under
-      schemaFile = null  // A String or File reference that is relative to src/main/schemas/xjc
       schemaRootDir = "$projectDir/src/$sourceSet/schemas/xjc"  // A String or File reference to serve as the root directory holding the schema. Available since version 1.1.
+      schemaFile = null  // A String or File reference that is relative to schemaRootDir
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
     }
