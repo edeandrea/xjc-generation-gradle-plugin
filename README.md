@@ -118,7 +118,7 @@ For this example to work you would have the following filesystem layout
         resources/
             schemas/
                 some-third-schema-1.0/
-                somethirdschema-1.0.xsd
+                    somethirdschema-1.0.xsd
     src/
         main/
             schemas/
