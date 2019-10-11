@@ -19,12 +19,15 @@ package com.github.edeandrea.xjcplugin.type
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
+import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -46,8 +49,9 @@ open class Xjc : DefaultTask() {
 	/**
 	 * The schema file
 	 */
-	@InputFile
-	lateinit var schemaFile: File
+	@InputFiles
+	@SkipWhenEmpty
+	lateinit var schemaFiles: FileCollection
 
 	/**
 	 * The binding file
@@ -78,12 +82,8 @@ open class Xjc : DefaultTask() {
 	private var xjcTaskAlreadyCreated = false
 
 	private fun validateProperties() {
-		if (this.schemaGenDir == null) {
-			throw GradleException("Property 'schemaGenDir' not set on task $name")
-		}
-
-		if (this.schemaFile == null) {
-			throw GradleException("Property 'schemaFile' not set on task $name")
+		if (this.schemaFiles.isEmpty) {
+			throw GradleException("Property 'schemaFiles' not set on task $name")
 		}
 	}
 
@@ -93,8 +93,6 @@ open class Xjc : DefaultTask() {
 	@TaskAction
 	fun generateSources() {
 		validateProperties()
-
-		LOGGER.lifecycle("Running XJC compiler for schema $schemaFile")
 
 		if (JavaVersion.current().isJava8Compatible) {
 			System.setProperty("javax.xml.accessExternalSchema", "all")
@@ -113,22 +111,26 @@ open class Xjc : DefaultTask() {
 			)
 		}
 
-		val language = if (this.schemaFile.name.endsWith("wsdl")) "WSDL" else "XMLSCHEMA"
-		val optionsMap = mutableMapOf(
-			"destdir" to this.schemaGenDir.absolutePath,
-			"extension" to true,
-			"schema" to schemaFile,
-			"language" to language
-		)
+		this.schemaFiles.forEach { schemaFile ->
+			LOGGER.lifecycle("Running XJC compiler for schema $schemaFile")
 
-		if (this.javaPackageName.isNotBlank()) {
-			optionsMap["package"] = this.javaPackageName
+			val language = if (schemaFile.name.endsWith("wsdl")) "WSDL" else "XMLSCHEMA"
+			val optionsMap = mutableMapOf(
+				"destdir" to this.schemaGenDir.absolutePath,
+				"extension" to true,
+				"schema" to schemaFile,
+				"language" to language
+			)
+
+			if (this.javaPackageName.isNotBlank()) {
+				optionsMap["package"] = this.javaPackageName
+			}
+
+			if (this.bindingFile != null) {
+				optionsMap["binding"] = this.bindingFile
+			}
+
+			ant.invokeMethod("xjc", optionsMap)
 		}
-
-		if (this.bindingFile != null) {
-			optionsMap["binding"] = this.bindingFile
-		}
-
-		ant.invokeMethod("xjc", optionsMap)
 	}
 }

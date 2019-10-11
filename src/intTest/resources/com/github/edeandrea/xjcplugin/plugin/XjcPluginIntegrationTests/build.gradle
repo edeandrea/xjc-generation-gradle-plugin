@@ -40,5 +40,24 @@ xjcGeneration {
 			schemaRootDir = 'misc/resources/schemas'
 			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.artifactory'
 		}
+
+		schema1 {
+			schemaDir = 'schema-1'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.schema1'
+		}
+
+		schemaDirWith2Schemas {
+			taskName = 'schemaDirWith2Schemas'
+			schemaDir = 'schema-dir-with-2-schemas'
+			schemaRootDir = 'misc/resources/schemas'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.schemadirwith2schemas'
+			sourceSet = 'test'
+		}
+
+		schemaDirWithNestedFolders {
+			taskName = 'schemaDirWithNestedFolders'
+			schemaDir = 'schemaDirWithNestedFolders/root'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.schemadirwithnestedfolders'
+		}
 	}
 }

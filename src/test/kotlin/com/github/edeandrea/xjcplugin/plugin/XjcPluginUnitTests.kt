@@ -22,6 +22,7 @@ import com.github.edeandrea.xjcplugin.domain.XjcExtension
 import com.github.edeandrea.xjcplugin.type.Xjc
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
+import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -69,7 +70,7 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			task.description = "Generate the sources from the schema"
 			task.group = "Code Generation"
 			task.javaPackageName = "com.some.project.generated.jaxb"
-			task.schemaFile = File(tempFolder, "schema.xsd")
+			task.schemaFiles = project.files(File(tempFolder, "schema.xsd"))
 		}
 
 		runProjectAfterEvaluate(project)
@@ -208,14 +209,60 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 	}
 
 	@Test
-	fun `xjcGeneration extension is missing required schemaFile property`() {
+	fun `xjcGeneration extension is missing required schemaFile and schemaDir properties`() {
 		val project = createProject()
 		addSchemas(project, Schema("schema"))
 
-		assertThatExceptionOfType(UninitializedPropertyAccessException::class.java)
+		assertThatExceptionOfType(GradleException::class.java)
 			.isThrownBy { runProjectAfterEvaluate(project) }
-			.withMessage("lateinit property schemaFile has not been initialized")
+			.withMessage("Schema 'schema' ==> Either property 'schemaFile' or 'schemaDir' needs to be set (but not both)")
 			.withNoCause()
+	}
+
+	@Test
+	fun `xjcGeneration extension defines both schemaFile and schemaDir properties`() {
+		val project = createProject()
+		val schema = Schema("schema")
+		schema.schemaFile = "some-schema.xsd"
+		schema.schemaDir = "someDir"
+
+		addSchemas(project, schema)
+
+		assertThatExceptionOfType(GradleException::class.java)
+			.isThrownBy { runProjectAfterEvaluate(project) }
+			.withMessage("Schema 'schema' ==> Both properties 'schemaFile' and 'schemaDir' are set. Only one can be set.")
+			.withNoCause()
+	}
+
+	@Test
+	fun `Schema task names generated correctly`() {
+		val project = createProject()
+		val schemaWithFileAndPackage = Schema("schemaWithFileAndPackage")
+		schemaWithFileAndPackage.schemaFile = "some-schema.xsd"
+		schemaWithFileAndPackage.javaPackageName = "com.something.fileandpackage"
+
+		val schemaWithDirAndPackage = Schema("schemaWithDirAndPackage")
+		schemaWithDirAndPackage.schemaDir = "some-schema-dir"
+		schemaWithDirAndPackage.javaPackageName = "com.something.dirandpackage"
+
+		val schemaWithFileAndNoPackage = Schema("schemaWithFileAndNoPackage")
+		schemaWithFileAndNoPackage.schemaFile = "some-schema-no-package.wsdl"
+
+		val schemaWithDirAndNoPackage = Schema("schemaWithDirAndNoPackage")
+		schemaWithDirAndNoPackage.schemaDir = "some-dir/some-schema-dir-no-package.wsdl"
+
+		val schemaWithTaskName = Schema("schemaWithTaskName")
+		schemaWithTaskName.schemaFile = "schemaWithTaskName.xsd"
+		schemaWithTaskName.taskName = "schemaWithTaskName"
+
+		addSchemas(project, schemaWithFileAndPackage, schemaWithDirAndPackage, schemaWithFileAndNoPackage, schemaWithDirAndNoPackage, schemaWithTaskName)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(5)
 	}
 
 	@Test
@@ -234,10 +281,14 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			.isNotEmpty
 			.hasSize(1)
 
-		assertThat(xjcTasks.first())
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
 			.isNotNull()
-			.extracting("schemaFile")
-			.isEqualTo(project.file("${project.projectDir}/src/main/schemas/xjc/some-schema1.xsd"))
+
+		assertThat(firstTask.schemaFiles)
+			.isNotEmpty
+			.hasSameElementsAs(project.files("${project.projectDir}/src/main/schemas/xjc/some-schema1.xsd"))
 	}
 
 	@Test
@@ -257,9 +308,13 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			.isNotEmpty
 			.hasSize(1)
 
-		assertThat(xjcTasks.first())
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
 			.isNotNull()
-			.extracting("schemaFile")
-			.isEqualTo(project.file("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
+
+		assertThat(firstTask.schemaFiles)
+			.isNotEmpty
+			.hasSameElementsAs(project.files("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
 	}
 }

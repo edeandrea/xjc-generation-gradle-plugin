@@ -54,7 +54,8 @@ xjcGeneration {
       description = null  // A description of the schema
       javaPackageName = ""  // The java package to generate the sources under
       schemaRootDir = "$projectDir/src/$sourceSet/schemas/xjc"  // A String or File reference to serve as the root directory holding the schema. Available since version 1.1.
-      schemaFile = null  // A String or File reference that is relative to schemaRootDir
+      schemaFile = null  // A String or File reference that is relative to schemaRootDir containing the location of the file to generate sources from. Only this or schemaDir can be used, not both.
+      schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both.
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
     }
@@ -106,6 +107,11 @@ xjcGeneration {
       javaPackageName = 'com.anothercompany.somethirdpackage.generated'
       schemaRootDir = 'misc/resources/schemas'
     }
+
+    someFourthSchema {
+      schemaDir = 'some-schema-dir'
+      javaPackageName = ' com.fourthcompany.somepackage.generated'
+    }
   }
 }
 ```
@@ -125,6 +131,13 @@ For this example to work you would have the following filesystem layout
                 xjc/
                     maven-4.0/
                         maven-4.0.0.xsd
+                    some-schema-dir/
+                        nestedfolder1/
+                            nestedfolder2/
+                                schema.xsd
+                            anotherschema.wsdl
+                        fourthschema.xsd
+                        someWsdl.wsdl
                     xjc.xjb.xml
         test/
             schemas/
@@ -146,6 +159,10 @@ After running the generation the output would be
                             somethirdpackage/
                                 generated/
                                     All generated .class files for the somethirdschema-1.0.xsd schema in here
+                        fourthcompany/
+                            somepackage/
+                                generated/
+                                    All generated .class files for fourthschema.xsd, someWsdl.wsdl, anotherschema.wsdl, and schema.xsd
                         github/
                             edeandrea/
                                 generated/

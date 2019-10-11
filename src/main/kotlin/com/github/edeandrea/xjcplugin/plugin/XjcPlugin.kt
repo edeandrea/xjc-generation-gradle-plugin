@@ -22,8 +22,10 @@ import com.github.edeandrea.xjcplugin.type.Xjc
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.SourceSetContainer
+import java.io.File
 
 /**
  * The main plugin class
@@ -57,37 +59,43 @@ class XjcPlugin : Plugin<Project> {
 		val xjcExtension = project.extensions.getByType(XjcExtension::class.java)
 		val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
 
-		xjcExtension.schemas?.forEach { schema ->
-			if ((schema.schemaFile == null) || schema.schemaFile.isBlank()) {
-				throw GradleException("Required property 'schemaFile' for schema '${schema.name}' not set")
+		xjcExtension.schemas.forEach { schema ->
+			val schemaFileBlank = schema.schemaFile.isNullOrBlank()
+			val schemaDirBlank = schema.schemaDir.isNullOrBlank()
+
+			if (schemaFileBlank && schemaDirBlank) {
+				throw GradleException("Schema '${schema.name}' ==> Either property 'schemaFile' or 'schemaDir' needs to be set (but not both)")
+			}
+
+			if (!schemaFileBlank && !schemaDirBlank) {
+				throw GradleException("Schema '${schema.name}' ==> Both properties 'schemaFile' and 'schemaDir' are set. Only one can be set.")
 			}
 
 			val taskName = getTaskName(schema)
 			val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
 			val sourceSet = sourceSets.getByName(sourceSetName)
 			val schemaRootDir = schema.schemaRootDir ?: "${project.projectDir}/src/$sourceSetName/schemas/xjc"
-			val schemaDir = project.file(schemaRootDir)
-			val schemaFile = project.file("$schemaDir/${schema.schemaFile}")
+			val schemaFiles = getSchemaFiles(project, schemaRootDir, schema, schemaDirBlank)
 			val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
 			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
-			val taskDesc = schema.description ?: "Generate sources for the schema file $schemaFile"
+			val taskDesc = schema.description ?: "Generate sources for the schema ${schema.name}"
 
 			log.info("------------------------------------------")
 			log.info("taskName = $taskName")
 			log.info("sourceSetName = $sourceSetName")
 			log.info("schemaRootDir = $schemaRootDir")
-			log.info("schemaDir = $schemaDir")
-			log.info("schemaFile = $schemaFile")
 			log.info("generatedSourcesDir = $generatedSourcesDir")
 			log.info("bindingFile = $bindingFile")
 			log.info("taskDesc = $taskDesc")
+			log.info("schemaFiles =")
+			schemaFiles.files.map(File::getPath).forEach(log::info)
 			log.info("------------------------------------------")
 
 			sourceSet.java.srcDir(generatedSourcesDir)
 
 			val xjcTask = project.tasks.create(taskName, Xjc::class.java) {
 				it.description = taskDesc
-				it.schemaFile = schemaFile
+				it.schemaFiles = schemaFiles
 				it.javaPackageName = schema.javaPackageName
 				it.sourceSet = sourceSet
 				it.bindingFile = bindingFile
@@ -99,18 +107,24 @@ class XjcPlugin : Plugin<Project> {
 		}
 	}
 
+	private fun getSchemaFiles(project: Project, schemaRootDir: String, schema: Schema, useSchemaFile: Boolean): FileCollection {
+		return if (useSchemaFile) project.files("$schemaRootDir/${schema.schemaFile}")
+							else project.files(project.file("$schemaRootDir/${schema.schemaDir}").walkTopDown().filter { it.isFile }.toList())
+	}
+
 	private fun getTaskName(schema: Schema): String {
 		val schemaGenTaskNameBeginning = "schemaGen_"
 
-		if (schema.taskName == null) {
+		if (schema.taskName.isNullOrBlank()) {
 			val javaPackageName = schema.javaPackageName
 
-			if (javaPackageName != null) {
+			if (javaPackageName.isNotBlank()) {
 				val replacedPackageName = javaPackageName.replace(".", "-")
 				return "${schemaGenTaskNameBeginning}${replacedPackageName}"
 			}
 			else {
-				val replacedSchemaFile = schema.schemaFile.replace(" ", "-")
+				val schemaStr = schema.schemaFile ?: schema.schemaDir
+				val replacedSchemaFile = schemaStr!!.replace(" ", "-").replace("/", "-")
 				return "${schemaGenTaskNameBeginning}${replacedSchemaFile}"
 			}
 		}

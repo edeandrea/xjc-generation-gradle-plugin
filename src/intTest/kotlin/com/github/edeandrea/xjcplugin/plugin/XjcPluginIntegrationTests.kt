@@ -25,41 +25,64 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
-	internal data class Schema(val taskName: String, val sourceSetName: String = "main", val packageFolder: String, val schemaRootDir: String = "src/$sourceSetName/schemas/xjc")
+	internal data class Schema(
+		val taskName: String,
+		val sourceSetName: String = "main",
+		val packageFolder: String,
+		val schemaRootDir: String = "src/$sourceSetName/schemas/xjc",
+		val expectedOutcome: TaskOutcome = TaskOutcome.SUCCESS
+	)
 
-	private val schemasList = listOf(
-		Schema(
+	private val schemasMap = mapOf(
+		"generateMaven2Schema" to Schema(
 			taskName = "generateMaven2Schema",
 			packageFolder = "com/github/edeandrea/xjcplugin/generated/maven2"
 		),
-		Schema(
+		"generateMavenSchema" to Schema(
 			taskName = "generateMavenSchema",
 			sourceSetName = "test",
 			packageFolder = "com/github/edeandrea/xjcplugin/generated/maven"
 		),
-		Schema(
+		"schemaGen_com-github-edeandrea-xjcplugin-generated-artifactory" to Schema(
 			taskName = "schemaGen_com-github-edeandrea-xjcplugin-generated-artifactory",
 			packageFolder = "com/github/edeandrea/xjcplugin/generated/artifactory",
 			schemaRootDir = "misc/resources/schemas/artifactory"
+		),
+		"schemaGen_com-github-edeandrea-xjcplugin-generated-schema1" to Schema(
+			taskName = "schemaGen_com-github-edeandrea-xjcplugin-generated-schema1",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/schema1",
+			expectedOutcome = TaskOutcome.NO_SOURCE
+		),
+		"schemaDirWith2Schemas" to Schema(
+			taskName = "schemaDirWith2Schemas",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwith2schemas",
+			sourceSetName = "test",
+			schemaRootDir = "misc/resources/schemas/schemaDirWith2Schemas"
+		),
+		"schemaDirWithNestedFolders" to Schema(
+			taskName = "schemaDirWithNestedFolders",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwithnestedfolders"
 		)
 	)
 
-	private fun schemas() = schemasList
+	private fun schemas() = schemasMap.values
 
 	@Test
 	fun `xjcGeneration task works as expected`() {
 		val buildResult = build("clean", "xjcGeneration")
 
-		this.schemasList
+		this.schemasMap.values
 			.map { it.taskName }
 			.plus("xjcGeneration")
 			.forEach { taskName ->
+				val expectedOutcome = if (taskName == "xjcGeneration") TaskOutcome.SUCCESS else this.schemasMap[taskName]!!.expectedOutcome
+
 				assertThat(buildResult.task(":$taskName")?.outcome)
-				.isNotNull()
-				.isEqualTo(TaskOutcome.SUCCESS)
+					.isNotNull()
+					.isEqualTo(expectedOutcome)
 		}
 
-		this.schemasList.forEach(this::verifySchema)
+		this.schemasMap.values.forEach(this::verifySchema)
 	}
 
 	@ParameterizedTest(name = "{index} ==> XJC generation for schema {0} should be correct")
@@ -69,7 +92,7 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 
 		assertThat(buildResult.task(":${schema.taskName}")?.outcome)
 			.isNotNull()
-			.isEqualTo(TaskOutcome.SUCCESS)
+			.isEqualTo(schema.expectedOutcome)
 
 		assertThat(buildResult.task(":xjcGeneration")?.outcome)
 			.isNull()
@@ -112,6 +135,11 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 
 		if (!allFilesEqual) {
 			println("Contents of expected file ${expectedFileNotEqual?.absolutePath} and actual file ${actualFileNotEqual?.absolutePath} aren't the same")
+			println("${expectedFileNotEqual?.absolutePath}:")
+			println(expectedFileNotEqual?.readText())
+			println("------------------------------------------------------")
+			println("${actualFileNotEqual?.absolutePath}:")
+			println(actualFileNotEqual?.readText())
 		}
 
 		return allFilesEqual

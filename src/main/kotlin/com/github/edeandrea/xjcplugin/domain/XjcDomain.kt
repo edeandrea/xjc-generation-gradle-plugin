@@ -70,9 +70,9 @@ class Schema(val name: String) {
 	var javaPackageName: String = ""
 
 	/**
-	 * The schema file to use
+	 * The schema file to use. Either this or [schemaDir] needs to be set, but not both
 	 */
-	lateinit var schemaFile: String
+	var schemaFile: String? = null
 
 	/**
 	 * The source set
@@ -91,20 +91,35 @@ class Schema(val name: String) {
 	var schemaRootDir: String? = null
 
 	/**
-	 * Override for setting the *schemaFile* as a [File]
-	 * @param schemaFile The [File] reference to the *schemaFile*
+	 * The schema directory to use. Either this or [schemaFile] needs to be set, but not both
+	 * @since 1.1
+	 */
+	var schemaDir: String? = null
+
+	/**
+	 * Override for setting the [schemaFile] as a [File]
+	 * @param schemaFile The [File] reference to the [schemaFile]
 	 */
 	fun setSchemaFile(schemaFile: File) {
 		this.schemaFile = schemaFile.absolutePath
 	}
 
 	/**
-	 * Override for setting the *schemaRootDir* as a [File]
-	 * @param schemaRootDir The [File] reference to the *schemaRootDir*
+	 * Override for setting the [schemaRootDir] as a [File]
+	 * @param schemaRootDir The [File] reference to the [schemaRootDir]
 	 * @since 1.1
 	 */
 	fun setSchemaRootDir(schemaRootDir: File) {
 		this.schemaRootDir = schemaRootDir.absolutePath
+	}
+
+	/**
+	 * Override for setting the [schemaDir] as a [File]
+	 * @param schemaDir The [File] reference to the [schemaDir]
+	 * @since 1.1
+	 */
+	fun setSchemaDir(schemaDir: File) {
+		this.schemaDir = schemaDir.absolutePath
 	}
 
 	/**
