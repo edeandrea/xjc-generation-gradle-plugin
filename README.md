@@ -55,7 +55,7 @@ xjcGeneration {
       javaPackageName = ""  // The java package to generate the sources under
       schemaRootDir = "$projectDir/src/$sourceSet/schemas/xjc"  // A String or File reference to serve as the root directory holding the schema. Available since version 1.1.
       schemaFile = null  // A String or File reference that is relative to schemaRootDir containing the location of the file to generate sources from. Only this or schemaDir can be used, not both.
-      schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both.
+      schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both. Available since version 1.1.
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
     }
