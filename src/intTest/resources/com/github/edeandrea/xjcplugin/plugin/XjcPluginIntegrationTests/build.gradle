@@ -34,5 +34,11 @@ xjcGeneration {
 			taskName = 'generateMavenSchema'
 			sourceSet = 'test'
 		}
+
+		artifactory {
+			schemaFile = 'artifactory.xsd'
+			schemaRootDir = 'misc/resources/schemas'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.artifactory'
+		}
 	}
 }

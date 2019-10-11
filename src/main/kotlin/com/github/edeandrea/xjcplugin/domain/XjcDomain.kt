@@ -85,11 +85,26 @@ class Schema(val name: String) {
 	var taskName: String? = null
 
 	/**
+	 * The schema root directory
+	 * @since 1.1
+	 */
+	var schemaRootDir: String? = null
+
+	/**
 	 * Override for setting the *schemaFile* as a [File]
 	 * @param schemaFile The [File] reference to the *schemaFile*
 	 */
 	fun setSchemaFile(schemaFile: File) {
 		this.schemaFile = schemaFile.absolutePath
+	}
+
+	/**
+	 * Override for setting the *schemaRootDir* as a [File]
+	 * @param schemaRootDir The [File] reference to the *schemaRootDir*
+	 * @since 1.1
+	 */
+	fun setSchemaRootDir(schemaRootDir: File) {
+		this.schemaRootDir = schemaRootDir.absolutePath
 	}
 
 	/**

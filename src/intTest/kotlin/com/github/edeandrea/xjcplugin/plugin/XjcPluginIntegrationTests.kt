@@ -18,33 +18,63 @@ package com.github.edeandrea.xjcplugin.plugin
 
 import com.github.edeandrea.xjcplugin.AbstractIntegrationTests
 import org.assertj.core.api.Assertions.assertThat
+import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import java.util.stream.Stream
 
 internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
-	@ParameterizedTest(name = "{index} ==> XJC generation for task ''{0}'' should produce the package ''{1}'' in the ''{2}'' source set")
-	@MethodSource("xjcGenerationParams")
-	fun `XJC generation for task should produce the proper results`(taskName: String, sourceSetName: String, packageName: String) {
-		build("clean", taskName)
-		val expectedFilesDir = File("$testDir/expected/src/$sourceSetName/schemas/xjc/$packageName")
-		val actualSourceFilesDir = File("$testDir/build/generated-sources/$sourceSetName/xjc/$packageName")
-		val expectedFiles = expectedFilesDir.listFiles().toList()
-		val actualFiles = actualSourceFilesDir.listFiles().toList()
+	internal data class Schema(val taskName: String, val sourceSetName: String = "main", val packageFolder: String, val schemaRootDir: String = "src/$sourceSetName/schemas/xjc")
 
-		assertThat(expectedFiles).hasSameSizeAs(actualFiles)
-		assertThat(areFilesAllEqual(actualFiles, expectedFiles)).isTrue()
+	private val schemasList = listOf(
+		Schema(
+			taskName = "generateMaven2Schema",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/maven2"
+		),
+		Schema(
+			taskName = "generateMavenSchema",
+			sourceSetName = "test",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/maven"
+		),
+		Schema(
+			taskName = "schemaGen_com-github-edeandrea-xjcplugin-generated-artifactory",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/artifactory",
+			schemaRootDir = "misc/resources/schemas/artifactory"
+		)
+	)
+
+	private fun schemas() = schemasList
+
+	@Test
+	fun `xjcGeneration task works as expected`() {
+		val buildResult = build("clean", "xjcGeneration")
+
+		this.schemasList
+			.map { it.taskName }
+			.plus("xjcGeneration")
+			.forEach { taskName ->
+				assertThat(buildResult.task(":$taskName")?.outcome)
+				.isNotNull()
+				.isEqualTo(TaskOutcome.SUCCESS)
+		}
+
+		this.schemasList.forEach(this::verifySchema)
 	}
 
-	fun xjcGenerationParams(): Stream<Arguments> {
-		return Stream.of(
-			Arguments.of("xjcGeneration", "main", "com/github/edeandrea/xjcplugin/generated/maven2"),
-			Arguments.of("xjcGeneration", "test", "com/github/edeandrea/xjcplugin/generated/maven"),
-			Arguments.of("generateMaven2Schema", "main", "com/github/edeandrea/xjcplugin/generated/maven2"),
-			Arguments.of("generateMavenSchema", "test", "com/github/edeandrea/xjcplugin/generated/maven")
-		)
+	@ParameterizedTest(name = "{index} ==> XJC generation for schema {0} should be correct")
+	@MethodSource("schemas")
+	fun `XJC generation for task should produce the proper results`(schema: Schema) {
+		val buildResult = build("clean", schema.taskName)
+
+		assertThat(buildResult.task(":${schema.taskName}")?.outcome)
+			.isNotNull()
+			.isEqualTo(TaskOutcome.SUCCESS)
+
+		assertThat(buildResult.task(":xjcGeneration")?.outcome)
+			.isNull()
+
+		verifySchema(schema)
 	}
 
 	private fun mapFilesByName(files: Collection<File>) = files.associateBy { it.name }
@@ -85,5 +115,16 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 		}
 
 		return allFilesEqual
+	}
+
+	private fun verifySchema(schema: Schema) {
+		println("Verifying schema $schema")
+		val expectedFilesDir = File("$testDir/expected/${schema.schemaRootDir}/${schema.packageFolder}")
+		val actualSourceFilesDir = File("$testDir/build/generated-sources/${schema.sourceSetName}/xjc/${schema.packageFolder}")
+		val expectedFiles = expectedFilesDir.walkTopDown().filter { it.isFile }.toList()
+		val actualFiles = actualSourceFilesDir.walkTopDown().filter { it.isFile }.toList()
+
+		assertThat(actualFiles).hasSameSizeAs(expectedFiles)
+		assertThat(areFilesAllEqual(actualFiles, expectedFiles)).isTrue()
 	}
 }

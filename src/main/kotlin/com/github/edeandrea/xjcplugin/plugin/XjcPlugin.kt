@@ -65,7 +65,8 @@ class XjcPlugin : Plugin<Project> {
 			val taskName = getTaskName(schema)
 			val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
 			val sourceSet = sourceSets.getByName(sourceSetName)
-			val schemaDir = project.file("${project.projectDir}/src/$sourceSetName/schemas/xjc")
+			val schemaRootDir = schema.schemaRootDir ?: "${project.projectDir}/src/$sourceSetName/schemas/xjc"
+			val schemaDir = project.file(schemaRootDir)
 			val schemaFile = project.file("$schemaDir/${schema.schemaFile}")
 			val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
 			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
@@ -74,6 +75,7 @@ class XjcPlugin : Plugin<Project> {
 			log.info("------------------------------------------")
 			log.info("taskName = $taskName")
 			log.info("sourceSetName = $sourceSetName")
+			log.info("schemaRootDir = $schemaRootDir")
 			log.info("schemaDir = $schemaDir")
 			log.info("schemaFile = $schemaFile")
 			log.info("generatedSourcesDir = $generatedSourcesDir")

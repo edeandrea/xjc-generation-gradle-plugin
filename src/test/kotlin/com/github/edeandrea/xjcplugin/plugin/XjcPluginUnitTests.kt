@@ -21,7 +21,6 @@ import com.github.edeandrea.xjcplugin.domain.Schema
 import com.github.edeandrea.xjcplugin.domain.XjcExtension
 import com.github.edeandrea.xjcplugin.type.Xjc
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
@@ -31,6 +30,11 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 internal class XjcPluginUnitTests : AbstractUnitTests() {
+	private fun addSchemas(project: Project, vararg schemas: Schema) =
+		project.extensions.getByType(XjcExtension::class.java).schemas.addAll(schemas)
+
+	private fun getXjcTasks(project: Project) = project.tasks.withType(Xjc::class.java)
+
 	private fun createProject() : Project {
 		val project = getProject("XjcPlugin")
 		project.pluginManager.apply(XjcPlugin::class.java)
@@ -96,14 +100,10 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		schema.javaPackageName = "some.package"
 
 		val project = createProject()
-		project.extensions.getByType(XjcExtension::class.java).schemas.add(schema)
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
 
-		assertThatCode {
-			runProjectAfterEvaluate(project)
-		}
-			.doesNotThrowAnyException()
-
-		assertThat(project.tasks.withType(Xjc::class.java).size).isEqualTo(1)
+		assertThat(getXjcTasks(project).size).isEqualTo(1)
 		assertThat(project.tasks.findByName("schemaGen_some-package")).isNotNull()
 	}
 
@@ -115,14 +115,10 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		schema.taskName = "someSchemaTask"
 
 		val project = createProject()
-		project.extensions.getByType(XjcExtension::class.java).schemas.add(schema)
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
 
-		assertThatCode {
-			runProjectAfterEvaluate(project)
-		}
-			.doesNotThrowAnyException()
-
-		assertThat(project.tasks.withType(Xjc::class.java).size).isEqualTo(1)
+		assertThat(getXjcTasks(project).size).isEqualTo(1)
 		assertThat(project.tasks.findByName("someSchemaTask")).isNotNull()
 	}
 
@@ -135,14 +131,10 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		schema.description = "Some description"
 
 		val project = createProject()
-		project.extensions.getByType(XjcExtension::class.java).schemas.add(schema)
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
 
-		assertThatCode {
-			runProjectAfterEvaluate(project)
-		}
-			.doesNotThrowAnyException()
-
-		assertThat(project.tasks.withType(Xjc::class.java).size).isEqualTo(1)
+		assertThat(getXjcTasks(project).size).isEqualTo(1)
 		assertThat(project.tasks.findByName("someSchemaTask"))
 			.isNotNull()
 			.extracting("description")
@@ -162,7 +154,7 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		schema2.taskName = "someSchemaTask"
 
 		val project = createProject()
-		project.extensions.getByType(XjcExtension::class.java).schemas.addAll(listOf(schema1, schema2))
+		addSchemas(project, schema1, schema2)
 
 		assertThatExceptionOfType(InvalidUserDataException::class.java)
 			.isThrownBy { runProjectAfterEvaluate(project) }
@@ -183,11 +175,10 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 
 		val project = createProject()
 		val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
-		project.extensions.getByType(XjcExtension::class.java).schemas.addAll(listOf(schema1, schema2))
-
+		addSchemas(project, schema1, schema2)
 		runProjectAfterEvaluate(project)
 
-		val xjcTasks = project.tasks.withType(Xjc::class.java)
+		val xjcTasks = getXjcTasks(project)
 
 		assertThat(xjcTasks)
 			.isNotEmpty
@@ -219,11 +210,56 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 	@Test
 	fun `xjcGeneration extension is missing required schemaFile property`() {
 		val project = createProject()
-		project.extensions.getByType(XjcExtension::class.java).schemas.add(Schema("schema"))
+		addSchemas(project, Schema("schema"))
 
 		assertThatExceptionOfType(UninitializedPropertyAccessException::class.java)
 			.isThrownBy { runProjectAfterEvaluate(project) }
 			.withMessage("lateinit property schemaFile has not been initialized")
 			.withNoCause()
+	}
+
+	@Test
+	fun `schemaRootDir default set correctly`() {
+		val schema = Schema("schema1")
+		schema.schemaFile = "some-schema1.xsd"
+		schema.javaPackageName = "some.package1"
+
+		val project = createProject()
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("schemaFile")
+			.isEqualTo(project.file("${project.projectDir}/src/main/schemas/xjc/some-schema1.xsd"))
+	}
+
+	@Test
+	fun `Overridden schemaRootDir set correctly`() {
+		val schema = Schema("schema1")
+		schema.schemaFile = "some-schema1.xsd"
+		schema.javaPackageName = "some.package1"
+		schema.schemaRootDir = "misc/resources/schemas"
+
+		val project = createProject()
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("schemaFile")
+			.isEqualTo(project.file("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
 	}
 }
