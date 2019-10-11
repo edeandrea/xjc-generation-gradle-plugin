@@ -62,7 +62,7 @@ xjcGeneration {
 }
 ```
 
-You want to place your schema files in the `src/${sourceSet}/schemas/xjc` folder. After generation happens, the generated sources will end up in the `${buildDir}/generated-sources/${sourceSet}/xjc` folder. They should be linked as a source/output directory in your IDE as well.
+You want to place your schema files in the `src/${sourceSet}/schemas/xjc` folder, unless a particular schema has defined a `schemaRootDir` (`schemaRootDir` available as of version `1.1`). After generation happens, the generated sources will end up in the `${buildDir}/generated-sources/${sourceSet}/xjc` folder. They should be linked as a source/output directory in your IDE as well.
 
 For each individual schema, the generation of that schema will happen prior to the `compile` task for the particular source set the schema is tied to (i.e. schemas for the `main` source set will happen before the `compileJava` task, schemas for the `test` source set will happen before the `compileTestJava` task(. There is also a single task called `xjcGeneration` that is introduced which will run the generation for all schemas.
 
