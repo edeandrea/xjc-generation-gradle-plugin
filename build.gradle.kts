@@ -21,7 +21,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 val junitVersion by extra { "5.5.2" }
 
 group = "com.github.edeandrea"
-version = "1.2"
+version = "1.3"
 
 sourceSets {
 	create("intTest") {
