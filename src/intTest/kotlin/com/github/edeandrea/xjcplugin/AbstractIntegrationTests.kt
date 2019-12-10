@@ -54,6 +54,6 @@ internal abstract class AbstractIntegrationTests {
 			.withProjectDir(this.testDir)
 			.withPluginClasspath()
 			.withGradleVersion(System.getProperty("gradleVersion"))
-			.withArguments(commands.asList())
+			.withArguments(listOf("-s").plus(commands.asList()))
 	}
 }

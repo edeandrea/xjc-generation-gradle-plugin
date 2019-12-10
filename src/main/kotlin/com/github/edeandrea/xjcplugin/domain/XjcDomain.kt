@@ -39,6 +39,18 @@ open class XjcExtension(project: Project) {
 	var defaultBindingFile: File? = null
 
 	/**
+	 * Default additional xjc options to be passed to xjc
+	 * @since 1.2
+	 */
+	var defaultAdditionalXjcOptions: Map<String, String> = mutableMapOf()
+
+	/**
+	 * Default additional xjc command line to be passed to xjc
+	 * @since 1.2
+	 */
+	var defaultAdditionalXjcCommandLineArgs: Map<String, String> = mutableMapOf()
+
+	/**
 	 * The collection of [schemas][Schema]
 	 */
 	var schemas: NamedDomainObjectContainer<Schema> = project.container(Schema::class.java)
@@ -95,6 +107,18 @@ class Schema(val name: String) {
 	 * @since 1.1
 	 */
 	var schemaDir: String? = null
+
+	/**
+	 * Any additional xjc options to be passed to xjc
+	 * @since 1.2
+	 */
+	var additionalXjcOptions: Map<String, String> = mutableMapOf()
+
+	/**
+	 * Any additional xjc command line args to be passed to xjc
+	 * @since 1.2
+	 */
+	var additionalXjcCommandLineArgs: Map<String, String> = mutableMapOf()
 
 	/**
 	 * Override for setting the [schemaFile] as a [File]

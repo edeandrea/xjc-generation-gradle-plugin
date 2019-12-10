@@ -79,6 +79,8 @@ class XjcPlugin : Plugin<Project> {
 			val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
 			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
 			val taskDesc = schema.description ?: "Generate sources for the schema ${schema.name}"
+			val additionalXjcOptions = xjcExtension.defaultAdditionalXjcOptions.plus(schema.additionalXjcOptions)
+			val additionalXjcCommandLineArgs = xjcExtension.defaultAdditionalXjcCommandLineArgs.plus(schema.additionalXjcCommandLineArgs)
 
 			log.info("------------------------------------------")
 			log.info("taskName = $taskName")
@@ -87,6 +89,8 @@ class XjcPlugin : Plugin<Project> {
 			log.info("generatedSourcesDir = $generatedSourcesDir")
 			log.info("bindingFile = $bindingFile")
 			log.info("taskDesc = $taskDesc")
+			log.info("additionalXjcOptions = $additionalXjcOptions")
+			log.info("additionalXjcCommandLineArgs = $additionalXjcCommandLineArgs")
 			log.info("schemaFiles =")
 			schemaFiles.files.map(File::getPath).forEach(log::info)
 			log.info("------------------------------------------")
@@ -100,6 +104,8 @@ class XjcPlugin : Plugin<Project> {
 				it.sourceSet = sourceSet
 				it.bindingFile = bindingFile
 				it.schemaGenDir = project.file(generatedSourcesDir)
+				it.additionalXjcOptions = additionalXjcOptions
+				it.additionalXjcCommandLineArgs = additionalXjcCommandLineArgs
 			}
 
 			val sourceSetNameTaskName = if (sourceSetName == "main") "compileJava" else "compile${sourceSetName.capitalize()}Java"

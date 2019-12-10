@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/edeandrea/xjc-generation-gradle-plugin.svg?branch=master)](https://travis-ci.org/edeandrea/xjc-generation-gradle-plugin)
 
 # xjc-generation-gradle-plugin
-A Gradle Plugin for generating JAXB Java sources using the XJC compiler
+A Gradle Plugin for generating JAXB Java sources using the XJC compiler. Under the covers uses the [XJC Ant Task](https://javaee.github.io/jaxb-v2/doc/user-guide/ch04.html#tools-xjc-ant-task).
 
 This plugin offers a flexible approach for allowing JAXB source generation using the XJC compiler. The core concept is to allow configuration of dependencies specific to the classpath of the XJC compiler while allowing the generated sources to end up in any particular `sourceSet` that the project may define.
 
@@ -45,6 +45,8 @@ Once that's done you can configure the `xjcGeneration` DSL as shown below. All t
 xjcGeneration {
   defaultBindingFile = null  // A File reference to a default binding file to be used for all schemas
   defaultSourceSet = 'main'  // The default sourceSet for all schemas to be generated from
+  defaultAdditionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for all schemas. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
+  defaultAdditionalXjcCommandLineArgs = [:]  // A Map containing additional command line args to pass to xjc for all schemas. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
   
   schemas {
     // Here you can create as many schemas as you would like. Each has to have a unique top-level name which can be whatever you choose
@@ -58,6 +60,8 @@ xjcGeneration {
       schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both. Available since version 1.1.
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
+      additionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcOptions. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
+      additionalXjcCommandLineArgs = [:]  // A Map containing additional command line args to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcCommandLineArgs. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
     }
   }
 }
@@ -88,6 +92,7 @@ dependencies {
 }
 
 xjcGeneration {
+  defaultAdditionalXjcOptions = ['encoding': 'UTF-8']
   defaultBindingFile = file 'src/main/schemas/xjc/xjc.xjb.xml'
   
   schemas {
@@ -112,6 +117,13 @@ xjcGeneration {
       schemaDir = 'some-schema-dir'
       javaPackageName = ' com.fourthcompany.somepackage.generated'
     }
+
+    someFifthSchema {
+      schemaFile = 'some-other-schema-dir/some-schema.xsd'
+      javaPackageName = 'com.someotherpackage'
+      additionalXjcOptions = ['encoding': 'EUC-JP']
+      additionalXjcCommandLineArgs = ['-verbose': '']
+    }
   }
 }
 ```
@@ -131,6 +143,8 @@ For this example to work you would have the following filesystem layout
                 xjc/
                     maven-4.0/
                         maven-4.0.0.xsd
+                    some-other-schema-dir/
+                        some-schema.xsd
                     some-schema-dir/
                         nestedfolder1/
                             nestedfolder2/
@@ -168,6 +182,8 @@ After running the generation the output would be
                                 generated/
                                     maven/
                                         All generated .class files for the maven-4.0.0.xsd schema in here
+                        someotherpackage/
+                            All generated .class files for some-schema.xsd schema in here
             test/
                 xjc/
                     com/

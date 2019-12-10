@@ -317,4 +317,86 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			.isNotEmpty
 			.hasSameElementsAs(project.files("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
 	}
+
+	@Test
+	fun `Additional Xjc Options set correctly`() {
+		val schema = Schema("schema1")
+		schema.schemaFile = "some-schema1.xsd"
+		schema.javaPackageName = "some.package1"
+		schema.schemaRootDir = "misc/resources/schemas"
+		schema.additionalXjcOptions = mapOf(
+			"verbose" to "",
+			"encoding" to "UTF-8"
+		)
+
+		val project = createProject()
+		project.extensions.getByType(XjcExtension::class.java).defaultAdditionalXjcOptions = mapOf(
+			"encoding" to "Windows",
+			"extension" to ""
+		)
+
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
+			.isNotNull()
+
+		assertThat(firstTask.additionalXjcOptions)
+			.isNotNull
+			.hasSize(3)
+			.containsExactlyInAnyOrderEntriesOf(mutableMapOf(
+				"verbose" to "",
+				"encoding" to "UTF-8",
+				"extension" to ""
+			))
+	}
+
+	@Test
+	fun `Additional Xjc command line args set correctly`() {
+		val schema = Schema("schema1")
+		schema.schemaFile = "some-schema1.xsd"
+		schema.javaPackageName = "some.package1"
+		schema.schemaRootDir = "misc/resources/schemas"
+		schema.additionalXjcCommandLineArgs = mapOf(
+			"verbose" to "",
+			"encoding" to "UTF-8"
+		)
+
+		val project = createProject()
+		project.extensions.getByType(XjcExtension::class.java).defaultAdditionalXjcCommandLineArgs = mapOf(
+			"encoding" to "Windows",
+			"extension" to ""
+		)
+
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
+			.isNotNull()
+
+		assertThat(firstTask.additionalXjcCommandLineArgs)
+			.isNotNull
+			.hasSize(3)
+			.containsExactlyInAnyOrderEntriesOf(mutableMapOf(
+				"verbose" to "",
+				"encoding" to "UTF-8",
+				"extension" to ""
+			))
+	}
 }

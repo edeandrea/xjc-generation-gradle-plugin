@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:version="2.1"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    jaxb:extensionBindingPrefixes="xjc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <jaxb:globalBindings>
+        <jaxb:serializable />
+        <xjc:simple />
+    </jaxb:globalBindings>
+</jaxb:bindings>

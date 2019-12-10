@@ -1,0 +1,1341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  ==========================================================================
+
+   This is the schema definition for a "General Invoice Request" process encoded
+   in XML. The GeneralInvoiceRequest is generated when sending one invoice to a
+   recipient via an intermediate either as tier garant (recipient= guarantor)
+   or tiers payant (recipient=insurance). That is the sender deals with the
+   intermediate in the sense of a mailbox. It is the intermediate's responsibility
+   to manage the communication with the recipient - insurance or guarantor.
+
+   This is normative for the electronic invoice project XMLInvoice.
+
+   Permission to use, and distribute this schema and its accompanying
+   documentation for any purpose and without fee is hereby granted in perpetuity,
+   provided that the above copyright notice and this paragraph appear in all copies
+   and this schema file is not altered.
+   The copyright holders make no representation about the suitability of the schema
+   for any purpose.
+
+   It is provided "as is" without expressed or implied warranty.
+
+   Copyright (c) 2005 Forum Datenaustausch, 
+   All Rights Reserved.
+   ==========================================================================  -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:invoice="http://www.forum-datenaustausch.ch/de" targetNamespace="http://www.forum-datenaustausch.ch/de" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- =======================================================================
+	General data type definitions
+ ======================================================================= -->
+	<!--  string type with length 1-3 characters  -->
+	<simpleType name="stringType1_3">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="3"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-9 characters  -->
+	<simpleType name="stringType1_9">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="9"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-12 characters  -->
+	<simpleType name="stringType1_12">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="12"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-20 characters  -->
+	<simpleType name="stringType1_20">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="20"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-25 characters  -->
+	<simpleType name="stringType1_25">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="25"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-35 characters  -->
+	<simpleType name="stringType1_35">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="35"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-50 characters  -->
+	<simpleType name="stringType1_50">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="50"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-70 characters  -->
+	<simpleType name="stringType1_70">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="70"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 1-350 characters  -->
+	<simpleType name="stringType1_350">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="350"/>
+		</restriction>
+	</simpleType>
+	<!--  string type with length 0-350 characters  -->
+	<simpleType name="stringType0_350">
+		<restriction base="string">
+			<maxLength value="350"/>
+		</restriction>
+	</simpleType>
+	<!--  EAN-, ZSR-, NIF- und AHV-Nr.  -->
+	<simpleType name="eanPartyType">
+		<restriction base="string">
+			<pattern value="(20[0-9]{11}|76[0-9]{11})"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="xtendEanPartyType">
+		<restriction base="string">
+			<pattern value="(20[0-9]{11}|76[0-9]{11}|unknown)"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="zsrPartyType">
+		<restriction base="string">
+			<pattern value="([A-Z][0-9]{6}|[0-9]{6}[A-Z])"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="unionPartyType">
+		<union memberTypes="invoice:xtendEanPartyType invoice:zsrPartyType"/>
+	</simpleType>
+	<simpleType name="nifPartyType">
+		<restriction base="string">
+			<pattern value="[0-9]{1,7}"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ssnPartyType">
+		<restriction base="string">
+			<pattern value="[1-9][0-9]{10}|[1-9][0-9]{12}"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ssn13PartyType">
+		<restriction base="string">
+			<pattern value="[1-9][0-9]{12}"/>
+		</restriction>
+	</simpleType>
+	<!-- =======================================================================
+	address data type definitions for companies and persons
+ ======================================================================= -->
+	<!--  Company  -->
+	<complexType name="companyType">
+		<sequence>
+			<element name="companyname" type="invoice:stringType1_35"/>
+			<element name="department" type="invoice:stringType1_35" minOccurs="0" maxOccurs="3"/>
+			<element name="postal" type="invoice:postalAddressType"/>
+			<element name="telecom" type="invoice:telecomAddressType" minOccurs="0"/>
+			<element name="online" type="invoice:onlineAddressType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<!--  Person  -->
+	<complexType name="personType">
+		<sequence>
+			<element name="familyname" type="invoice:stringType1_35"/>
+			<element name="givenname" type="invoice:stringType1_35" maxOccurs="3"/>
+			<element name="postal" type="invoice:postalAddressType"/>
+			<element name="telecom" type="invoice:telecomAddressType" minOccurs="0"/>
+			<element name="online" type="invoice:onlineAddressType" minOccurs="0"/>
+		</sequence>
+		<attribute name="salutation" type="invoice:stringType1_35"/>
+		<attribute name="title" type="invoice:stringType1_35"/>
+	</complexType>
+	<complexType name="zipType">
+		<simpleContent>
+			<extension base="invoice:stringType1_9">
+				<attribute name="statecode" type="invoice:stringType1_9"/>
+				<attribute name="countrycode" type="invoice:stringType1_3" default="CH"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="postalAddressType">
+		<sequence>
+			<sequence>
+				<element name="pobox" type="invoice:stringType1_35" minOccurs="0"/>
+				<element name="street" type="invoice:stringType1_35" minOccurs="0"/>
+			</sequence>
+			<element name="zip" type="invoice:zipType"/>
+			<element name="city" type="invoice:stringType1_35"/>
+		</sequence>
+	</complexType>
+	<complexType name="telecomAddressType">
+		<sequence>
+			<element name="phone" type="invoice:stringType1_25" maxOccurs="3"/>
+			<element name="fax" type="invoice:stringType1_25" minOccurs="0" maxOccurs="3"/>
+		</sequence>
+	</complexType>
+	<complexType name="onlineAddressType">
+		<sequence>
+			<element name="email" maxOccurs="3">
+				<simpleType>
+					<restriction base="invoice:stringType1_70">
+						<pattern value=".+@.+"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="url" minOccurs="0" maxOccurs="3">
+				<simpleType>
+					<restriction base="anyURI">
+						<minLength value="1"/>
+						<maxLength value="100"/>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<!-- =======================================================================
+	the specific address type data definitions
+ ======================================================================= -->
+	<!--  address = "Arbeitgeber"  -->
+	<complexType name="employerAddressType">
+		<choice>
+			<element name="ean_party" type="invoice:eanPartyType"/>
+			<element name="company" type="invoice:companyType"/>
+			<element name="person" type="invoice:personType"/>
+			<element name="reg_number" type="invoice:stringType1_35"/>
+		</choice>
+	</complexType>
+	<!--  address = "Biller"  -->
+	<complexType name="billerAddressType">
+		<choice minOccurs="0">
+			<element name="company" type="invoice:companyType"/>
+			<element name="person" type="invoice:personType"/>
+		</choice>
+		<attribute name="ean_party" type="invoice:eanPartyType" use="required"/>
+		<attribute name="zsr" type="invoice:zsrPartyType"/>
+		<attribute name="specialty" type="invoice:stringType1_350"/>
+	</complexType>
+	<!--  address = "Provider"  -->
+	<complexType name="providerAddressType">
+		<choice minOccurs="0">
+			<element name="company" type="invoice:companyType"/>
+			<element name="person" type="invoice:personType"/>
+		</choice>
+		<attribute name="ean_party" type="invoice:eanPartyType" use="required"/>
+		<attribute name="zsr" type="invoice:zsrPartyType" use="required"/>
+		<attribute name="specialty" type="invoice:stringType1_350"/>
+	</complexType>
+	<!--  address = "Insurance"  -->
+	<complexType name="insuranceAddressType">
+		<choice minOccurs="0">
+			<element name="company" type="invoice:companyType"/>
+		</choice>
+		<attribute name="ean_party" type="invoice:eanPartyType" use="required"/>
+	</complexType>
+	<!--  address = "Patient"  -->
+	<complexType name="patientAddressType">
+		<sequence>
+			<element name="person" type="invoice:personType"/>
+		</sequence>
+		<attribute name="gender" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="male"/>
+					<enumeration value="female"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="birthdate" type="dateTime" use="required"/>
+		<attribute name="unique_id" type="invoice:ssn13PartyType"/>
+	</complexType>
+	<!--  address = "Guarantor" (Gesetzlicher Vertreter)  -->
+	<complexType name="guarantorAddressType">
+		<choice>
+			<element name="company" type="invoice:companyType"/>
+			<element name="person" type="invoice:personType"/>
+		</choice>
+		<attribute name="unique_id" type="invoice:ssn13PartyType"/>
+	</complexType>
+	<!--  address = "Referrer"  -->
+	<complexType name="referrerAddressType">
+		<choice minOccurs="0">
+			<element name="company" type="invoice:companyType"/>
+			<element name="person" type="invoice:personType"/>
+		</choice>
+		<attribute name="ean_party" type="invoice:xtendEanPartyType" default="unknown"/>
+		<attribute name="zsr" type="invoice:zsrPartyType"/>
+	</complexType>
+	<!--  address = "Bank" (for ESR)  -->
+	<complexType name="bankAddressType">
+		<sequence>
+			<element name="company" type="invoice:companyType"/>
+		</sequence>
+	</complexType>
+	<!-- =======================================================================
+	service record data type definitions
+ ======================================================================= -->
+	<!--  the allowed service records  -->
+	<complexType name="servicesType">
+		<choice maxOccurs="unbounded">
+			<element name="record_tarmed" type="invoice:recordTarmedType"/>
+			<element name="record_cantonal" type="invoice:recordCantonalType"/>
+			<element name="record_unclassified" type="invoice:recordUnclassifiedType"/>
+			<element name="record_lab" type="invoice:recordLabType"/>
+			<element name="record_migel" type="invoice:recordMigelType"/>
+			<element name="record_physio" type="invoice:recordPhysioType"/>
+			<element name="record_drug" type="invoice:recordDrugType"/>
+			<element name="record_dental" type="invoice:recordDentalType"/>
+		</choice>
+	</complexType>
+	<!-- service record "TarMed"  -->
+	<complexType name="recordTarmedType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="treatment" default="ambulatory">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="ambulatory"/>
+							<enumeration value="semi_stationary"/>
+							<enumeration value="stationary"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="tariff_type" type="string" fixed="001"/>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="ref_code" type="invoice:stringType1_20"/>
+				<attribute name="number" type="positiveInteger" default="1"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:eanPartyType" use="required"/>
+				<attribute name="ean_responsible" type="invoice:eanPartyType" use="required"/>
+				<attribute name="billing_role" default="both">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="mt"/>
+							<enumeration value="tt"/>
+							<enumeration value="both"/>
+							<enumeration value="none"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="medical_role" default="self_employed">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="self_employed"/>
+							<enumeration value="employee"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="body_location" default="none">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="none"/>
+							<enumeration value="left"/>
+							<enumeration value="right"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit.mt" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor.mt" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="scale_factor.mt" type="double" default="1.0"/>
+				<attribute name="external_factor.mt" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount.mt" type="double" default="0.0"/>
+				<attribute name="unit.tt" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor.tt" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="scale_factor.tt" type="double" default="1.0"/>
+				<attribute name="external_factor.tt" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount.tt" type="double" default="0.0"/>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "Cantonal"  -->
+	<complexType name="recordCantonalType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" use="required">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="ref_code" type="invoice:stringType1_20"/>
+				<attribute name="number" type="positiveInteger" default="1"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "Unclassified"  -->
+	<complexType name="recordUnclassifiedType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" use="required">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="ref_code" type="invoice:stringType1_20"/>
+				<attribute name="number" type="positiveInteger" default="1"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "drugs"  -->
+	<complexType name="recordDrugType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" default="400">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "Lab"  -->
+	<complexType name="recordLabType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" default="316">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "MiGeL"  -->
+	<complexType name="recordMigelType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" default="452">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "Physiotherapy"  -->
+	<complexType name="recordPhysioType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" default="311">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="number" type="positiveInteger" default="1"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType" use="required"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType" use="required"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  service record "Dental"  -->
+	<complexType name="recordDentalType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="record_id" type="positiveInteger" use="required"/>
+				<attribute name="tariff_type" use="required">
+					<simpleType>
+						<restriction base="string">
+							<pattern value="[0-9A-Z]{3}"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_20" use="required"/>
+				<attribute name="ref_code" type="invoice:stringType1_20"/>
+				<attribute name="number" type="positiveInteger" default="1"/>
+				<attribute name="quantity" type="double" use="required"/>
+				<attribute name="date_begin" type="dateTime" use="required"/>
+				<attribute name="date_end" type="dateTime"/>
+				<attribute name="ean_provider" type="invoice:unionPartyType"/>
+				<attribute name="ean_responsible" type="invoice:unionPartyType"/>
+				<attribute name="unit" use="required">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="unit_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minExclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="external_factor" default="1.0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0.0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="amount" type="double" use="required"/>
+				<attribute name="vat_rate" default="0">
+					<simpleType>
+						<restriction base="double">
+							<minInclusive value="0"/>
+							<maxInclusive value="100"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="validate" type="boolean" default="true"/>
+				<attribute name="obligation" type="boolean" default="true"/>
+				<attribute name="remark" type="invoice:stringType1_350"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!-- =======================================================================
+	data type definitions regarding the applied law
+ ======================================================================= -->
+	<!--  law = KVG  -->
+	<complexType name="kvgLawType">
+		<sequence minOccurs="0">
+			<element name="employer" type="invoice:employerAddressType"/>
+		</sequence>
+		<attribute name="reason" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="disease"/>
+					<enumeration value="accident"/>
+					<enumeration value="maternity"/>
+					<enumeration value="prevention"/>
+					<enumeration value="birthdefect"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="patient_id" type="invoice:stringType1_35"/>
+		<attribute name="case_id" type="invoice:stringType1_35"/>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="contract_number" type="invoice:stringType1_35"/>
+	</complexType>
+	<!--  law = VVG  -->
+	<complexType name="vvgLawType">
+		<sequence minOccurs="0">
+			<element name="employer" type="invoice:employerAddressType"/>
+		</sequence>
+		<attribute name="reason" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="disease"/>
+					<enumeration value="accident"/>
+					<enumeration value="maternity"/>
+					<enumeration value="prevention"/>
+					<enumeration value="birthdefect"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="patient_id" type="invoice:stringType1_35"/>
+		<attribute name="case_id" type="invoice:stringType1_35"/>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="contract_number" type="invoice:stringType1_35"/>
+	</complexType>
+	<!--  law = UVG  -->
+	<complexType name="uvgLawType">
+		<sequence minOccurs="0">
+			<element name="employer" type="invoice:employerAddressType"/>
+		</sequence>
+		<attribute name="reason" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="disease"/>
+					<enumeration value="accident"/>
+					<enumeration value="maternity"/>
+					<enumeration value="prevention"/>
+					<enumeration value="birthdefect"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="patient_id" type="invoice:stringType1_35"/>
+		<attribute name="case_id" type="invoice:stringType1_35"/>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="contract_number" type="invoice:stringType1_35"/>
+		<attribute name="ssn" type="invoice:ssnPartyType"/>
+	</complexType>
+	<!--  law = IVG  -->
+	<complexType name="ivgLawType">
+		<sequence minOccurs="0">
+			<element name="employer" type="invoice:employerAddressType"/>
+		</sequence>
+		<attribute name="reason" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="disease"/>
+					<enumeration value="accident"/>
+					<enumeration value="maternity"/>
+					<enumeration value="prevention"/>
+					<enumeration value="birthdefect"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="case_id" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="([0-9]{14}|[0-9]{10}|[0-9]{9}|[0-9]{6})"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="ssn" type="invoice:ssnPartyType" use="required"/>
+		<attribute name="nif" type="invoice:nifPartyType" use="required"/>
+	</complexType>
+	<!--  law = MVG  -->
+	<complexType name="mvgLawType">
+		<sequence minOccurs="0">
+			<element name="employer" type="invoice:employerAddressType"/>
+		</sequence>
+		<attribute name="reason" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="disease"/>
+					<enumeration value="accident"/>
+					<enumeration value="maternity"/>
+					<enumeration value="prevention"/>
+					<enumeration value="birthdefect"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="patient_id" type="invoice:stringType1_35"/>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="ssn" type="invoice:ssnPartyType"/>
+	</complexType>
+	<!--  law = org ("Obligationenrecht" for self-paying patients of dentist invoices!)  -->
+	<complexType name="orgLawType">
+		<attribute name="patient_id" type="invoice:stringType1_35"/>
+		<attribute name="case_id" type="invoice:stringType1_35"/>
+		<attribute name="case_date" type="dateTime"/>
+		<attribute name="contract_number" type="invoice:stringType1_35"/>
+	</complexType>
+	<!-- =======================================================================
+	diagnosis data type definitions
+ ======================================================================= -->
+	<complexType name="diagnosisType">
+		<simpleContent>
+			<extension base="invoice:stringType0_350">
+				<attribute name="type" default="by_contract">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="ICD10"/>
+							<enumeration value="cantonal"/>
+							<enumeration value="by_contract"/>
+							<enumeration value="freetext"/>
+							<enumeration value="birthdefect"/>
+							<enumeration value="ICPC"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="code" type="invoice:stringType1_12"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!-- =======================================================================
+	detailed invoice data type definitions
+ ======================================================================= -->
+	<complexType name="detailType">
+		<sequence>
+			<element name="diagnosis" type="invoice:diagnosisType" minOccurs="0" maxOccurs="unbounded"/>
+			<choice>
+				<element name="kvg" type="invoice:kvgLawType"/>
+				<element name="vvg" type="invoice:vvgLawType"/>
+				<element name="uvg" type="invoice:uvgLawType"/>
+				<element name="ivg" type="invoice:ivgLawType"/>
+				<element name="mvg" type="invoice:mvgLawType"/>
+				<element name="org" type="invoice:orgLawType"/>
+			</choice>
+			<element name="services" type="invoice:servicesType"/>
+		</sequence>
+		<attribute name="date_begin" type="dateTime" use="required"/>
+		<attribute name="date_end" type="dateTime" use="required"/>
+		<attribute name="canton" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="AG"/>
+					<enumeration value="AI"/>
+					<enumeration value="AR"/>
+					<enumeration value="BE"/>
+					<enumeration value="BL"/>
+					<enumeration value="BS"/>
+					<enumeration value="FR"/>
+					<enumeration value="GE"/>
+					<enumeration value="GL"/>
+					<enumeration value="GR"/>
+					<enumeration value="JU"/>
+					<enumeration value="LU"/>
+					<enumeration value="NE"/>
+					<enumeration value="NW"/>
+					<enumeration value="OW"/>
+					<enumeration value="SG"/>
+					<enumeration value="SH"/>
+					<enumeration value="SO"/>
+					<enumeration value="SZ"/>
+					<enumeration value="TI"/>
+					<enumeration value="TG"/>
+					<enumeration value="UR"/>
+					<enumeration value="VD"/>
+					<enumeration value="VS"/>
+					<enumeration value="ZG"/>
+					<enumeration value="ZH"/>
+					<enumeration value="LI"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<!-- =======================================================================
+	TP and TG data type definitions
+ ======================================================================= -->
+	<!--  Tiers Garant  -->
+	<complexType name="garantType">
+		<sequence>
+			<element name="biller" type="invoice:billerAddressType"/>
+			<element name="provider" type="invoice:providerAddressType"/>
+			<element name="insurance" type="invoice:insuranceAddressType" minOccurs="0"/>
+			<element name="patient" type="invoice:patientAddressType"/>
+			<element name="guarantor" type="invoice:guarantorAddressType"/>
+			<element name="referrer" type="invoice:referrerAddressType" minOccurs="0"/>
+		</sequence>
+		<attribute name="payment_periode" type="duration" default="P30D"/>
+	</complexType>
+	<!--  Tiers Payant  -->
+	<complexType name="payantType">
+		<sequence>
+			<element name="biller" type="invoice:billerAddressType"/>
+			<element name="provider" type="invoice:providerAddressType"/>
+			<element name="insurance" type="invoice:insuranceAddressType"/>
+			<element name="patient" type="invoice:patientAddressType"/>
+			<element name="guarantor" type="invoice:guarantorAddressType"/>
+			<element name="referrer" type="invoice:referrerAddressType" minOccurs="0"/>
+		</sequence>
+		<attribute name="invoice_modification" type="boolean" default="false"/>
+		<attribute name="purpose" default="invoice">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="invoice"/>
+					<enumeration value="annulment"/>
+					<enumeration value="creditAdvice"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<!-- =======================================================================
+	ESR payment data type definitions
+ ======================================================================= -->
+	<!--  ESR 5  -->
+	<complexType name="esr5Type">
+		<sequence>
+			<element name="bank" type="invoice:bankAddressType" minOccurs="0"/>
+		</sequence>
+		<attribute name="type" default="15">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="15plus"/>
+					<enumeration value="15"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="participant_number" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[0-9]{5}"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="reference_number" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[0-9]{5} [0-9]{5} [0-9]{5}"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="coding_line" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="(&lt;[0-9]{2}0001[0-9]{9}&gt; [0-9]{15}\+ [0-9]{5}&gt;|[0-9]{15}\+ [0-9]{5}&gt;)"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<!--  ESR 9  -->
+	<complexType name="esr9Type">
+		<sequence>
+			<element name="bank" type="invoice:bankAddressType" minOccurs="0"/>
+		</sequence>
+		<attribute name="type" default="16or27">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="16or27plus"/>
+					<enumeration value="16or27"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="reference_number" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="([0-9] [0-9]{5} [0-9]{5} [0-9]{5}|[0-9]{2} [0-9]{5} [0-9]{5} [0-9]{5} [0-9]{5} [0-9]{5})"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="participant_number" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="01-[1-9][0-9]{0,5}-[0-9]"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="coding_line" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="(01[0-9]{11}&gt;[0-9]{16}\+ [0-9]{9}&gt;|042&gt;[0-9]{16}\+ [0-9]{9}&gt;|01[0-9]{11}&gt;[0-9]{27}\+ [0-9]{9}&gt;|042&gt;[0-9]{27}\+ [0-9]{9}&gt;)"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<!--  Pay-in slip red (aka ESRred)  -->
+	<complexType name="esrRedType">
+		<sequence>
+			<element name="payment_for" type="invoice:bankAddressType" minOccurs="0"/>
+			<element name="in_favor_of" type="invoice:bankAddressType" minOccurs="0"/>
+			<element name="payment_reason" type="invoice:stringType1_35" minOccurs="0" maxOccurs="4"/>
+		</sequence>
+		<attribute name="payment_to" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="postal_account"/>
+					<enumeration value="bank_account"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="bank_account_number" type="invoice:stringType1_35"/>
+		<attribute name="bank_clearing_number" type="invoice:stringType1_35"/>
+		<attribute name="participant_number" type="invoice:stringType1_35"/>
+		<attribute name="coding_line1" type="invoice:stringType1_70"/>
+		<attribute name="coding_line2" type="invoice:stringType1_70"/>
+	</complexType>
+	<!-- =======================================================================
+	data type definitions regarding the involved money & vat
+ ======================================================================= -->
+	<complexType name="vatRateType">
+		<attribute name="vat_rate" use="required">
+			<simpleType>
+				<restriction base="double">
+					<minInclusive value="0"/>
+					<maxInclusive value="100"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="amount" type="double" use="required"/>
+		<attribute name="vat" type="double" use="required"/>
+	</complexType>
+	<complexType name="vatType">
+		<sequence>
+			<element name="vat_rate" type="invoice:vatRateType" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="vat_number" type="positiveInteger"/>
+		<attribute name="vat" type="double" use="required"/>
+	</complexType>
+	<complexType name="balanceType">
+		<sequence>
+			<element name="vat" type="invoice:vatType"/>
+		</sequence>
+		<attribute name="currency" type="string" fixed="CHF"/>
+		<attribute name="amount" type="double" use="required"/>
+		<attribute name="amount_prepaid" default="0">
+			<simpleType>
+				<restriction base="double">
+					<minInclusive value="0"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="amount_due" use="required">
+			<simpleType>
+				<restriction base="double">
+					<minInclusive value="0"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="amount_tarmed" type="double" default="0"/>
+		<attribute name="unit_tarmed.mt" type="double" default="0"/>
+		<attribute name="amount_tarmed.mt" type="double" default="0"/>
+		<attribute name="unit_tarmed.tt" type="double" default="0"/>
+		<attribute name="amount_tarmed.tt" type="double" default="0"/>
+		<attribute name="amount_cantonal" type="double" default="0"/>
+		<attribute name="amount_unclassified" type="double" default="0"/>
+		<attribute name="amount_lab" type="double" default="0"/>
+		<attribute name="amount_migel" type="double" default="0"/>
+		<attribute name="amount_physio" type="double" default="0"/>
+		<attribute name="amount_drug" type="double" default="0"/>
+		<attribute name="amount_dental" type="double" default="0"/>
+		<attribute name="amount_obligations" type="double" default="0"/>
+	</complexType>
+	<!-- =======================================================================
+	data type definitions regarding back references
+ ======================================================================= -->
+	<complexType name="creditInfoType">
+		<attribute name="response_timestamp" type="unsignedLong" use="required"/>
+		<attribute name="response_id" type="invoice:stringType1_35" use="required"/>
+	</complexType>
+	<!-- =======================================================================
+	Header data type definitions
+ ======================================================================= -->
+	<complexType name="headerPartyType">
+		<attribute name="ean_party" type="invoice:eanPartyType" use="required"/>
+	</complexType>
+	<complexType name="xtendHeaderPartyType">
+		<attribute name="ean_party" type="invoice:xtendEanPartyType" use="required"/>
+	</complexType>
+	<complexType name="headerType">
+		<sequence>
+			<element name="sender" type="invoice:xtendHeaderPartyType"/>
+			<element name="intermediate" type="invoice:headerPartyType"/>
+			<element name="recipient" type="invoice:xtendHeaderPartyType"/>
+		</sequence>
+	</complexType>
+	<!-- =======================================================================
+	misc administrative data type definitions
+ ======================================================================= -->
+	<simpleType name="versionType">
+		<restriction base="integer"/>
+	</simpleType>
+	<complexType name="softwareType">
+		<simpleContent>
+			<extension base="invoice:stringType1_50">
+				<attribute name="version" type="invoice:versionType" use="required"/>
+				<attribute name="id" default="0">
+					<simpleType>
+						<restriction base="integer">
+							<minInclusive value="0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="generatorType">
+		<sequence>
+			<element name="software" type="invoice:softwareType"/>
+		</sequence>
+	</complexType>
+	<complexType name="dataValidatorType">
+		<simpleContent>
+			<extension base="invoice:stringType1_350">
+				<attribute name="focus" use="required">
+					<simpleType>
+						<restriction base="NMTOKEN">
+							<enumeration value="tarmed"/>
+							<enumeration value="cantonal"/>
+							<enumeration value="lab"/>
+							<enumeration value="unclassified"/>
+							<enumeration value="drug"/>
+							<enumeration value="migel"/>
+							<enumeration value="physio"/>
+							<enumeration value="dental"/>
+							<enumeration value="other"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="version_software" type="invoice:versionType" use="required"/>
+				<attribute name="version_db" type="invoice:versionType" use="required"/>
+				<attribute name="id" default="0">
+					<simpleType>
+						<restriction base="integer">
+							<minInclusive value="0"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--  prolog section  -->
+	<complexType name="prologType">
+		<sequence>
+			<element name="package" type="invoice:softwareType" minOccurs="0"/>
+			<element name="generator" type="invoice:generatorType"/>
+			<element name="validator" type="invoice:dataValidatorType" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<!-- =======================================================================
+	invoice data type definitions
+ ======================================================================= -->
+	<complexType name="invoiceType">
+		<sequence>
+			<element name="remark" type="invoice:stringType1_350" minOccurs="0"/>
+			<element name="creditInfo" type="invoice:creditInfoType" minOccurs="0"/>
+			<element name="balance" type="invoice:balanceType"/>
+			<choice>
+				<element name="esr5" type="invoice:esr5Type"/>
+				<element name="esr9" type="invoice:esr9Type"/>
+				<element name="esrRed" type="invoice:esrRedType"/>
+			</choice>
+			<choice>
+				<element name="tiers_garant" type="invoice:garantType"/>
+				<element name="tiers_payant" type="invoice:payantType"/>
+			</choice>
+			<element name="detail" type="invoice:detailType"/>
+		</sequence>
+		<attribute name="invoice_timestamp" type="unsignedLong" use="required"/>
+		<attribute name="invoice_id" type="invoice:stringType1_35" use="required"/>
+		<attribute name="invoice_date" type="dateTime" use="required"/>
+		<attribute name="resend" type="boolean" default="false"/>
+		<attribute name="case_id" type="invoice:stringType1_35"/>
+	</complexType>
+	<!-- =======================================================================
+     =======================================================================
+	Here starts the request with its root element
+ =======================================================================
+ ======================================================================= -->
+	<element name="request" type="invoice:requestType"/>
+	<complexType name="requestType">
+		<sequence>
+			<element name="header" type="invoice:headerType"/>
+			<element name="prolog" type="invoice:prologType"/>
+			<element name="invoice" type="invoice:invoiceType"/>
+		</sequence>
+		<attribute name="assignment_title" type="invoice:stringType1_35"/>
+		<attribute name="assignment_role" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="labtechnician"/>
+					<enumeration value="orthopaedictechnician"/>
+					<enumeration value="dentist"/>
+					<enumeration value="dentaltechnician"/>
+					<enumeration value="dentalhygienist"/>
+					<enumeration value="physiotherapist"/>
+					<enumeration value="ergotherapist"/>
+					<enumeration value="logotherapist"/>
+					<enumeration value="chiropraktor"/>
+					<enumeration value="diet"/>
+					<enumeration value="diabetics"/>
+					<enumeration value="massage"/>
+					<enumeration value="midwife"/>
+					<enumeration value="wholesaler"/>
+					<enumeration value="shoemaker"/>
+					<enumeration value="nurse"/>
+					<enumeration value="ambulance"/>
+					<enumeration value="druggist"/>
+					<enumeration value="carrier"/>
+					<enumeration value="other"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="assignment_place" use="required">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="practice"/>
+					<enumeration value="hospital"/>
+					<enumeration value="lab"/>
+					<enumeration value="association"/>
+					<enumeration value="company"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="role" default="production">
+			<simpleType>
+				<restriction base="NMTOKEN">
+					<enumeration value="production"/>
+					<enumeration value="test"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+</schema>

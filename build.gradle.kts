@@ -2,7 +2,7 @@ plugins {
 	id("com.gradle.plugin-publish") version "0.10.1"
 	`java-gradle-plugin`
 	idea
-	kotlin("jvm") version "1.3.50"
+	kotlin("jvm") version "1.3.61"
 }
 
 java {
@@ -21,7 +21,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 val junitVersion by extra { "5.5.2" }
 
 group = "com.github.edeandrea"
-version = "1.1"
+version = "1.2"
 
 sourceSets {
 	create("intTest") {
@@ -80,13 +80,14 @@ repositories {
 }
 
 dependencies {
+	implementation(gradleKotlinDsl())
 	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("reflect"))
-	testImplementation("org.assertj:assertj-core:3.13.2")
+	testImplementation("org.assertj:assertj-core:3.14.0")
 	testImplementation(kotlin("test-junit5"))
 	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-	intTestImplementation("org.assertj:assertj-core:3.13.2")
+	intTestImplementation("org.assertj:assertj-core:3.14.0")
 	intTestImplementation(kotlin("test-junit5"))
 	intTestImplementation(gradleTestKit())
 	intTestImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")

@@ -30,6 +30,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
 
 /**
@@ -79,6 +80,22 @@ open class Xjc : DefaultTask() {
 	@Internal
 	lateinit var sourceSet: SourceSet
 
+	/**
+	 * Any additional xjc options to be passed to xjc
+	 * @since 1.2
+	 */
+	@Input
+	@Optional
+	lateinit var additionalXjcOptions: Map<String, String>
+
+	/**
+	 * Any additional xjc command line args to be passed to xjc
+	 * @since 1.2
+	 */
+	@Input
+	@Optional
+	lateinit var additionalXjcCommandLineArgs: Map<String, String>
+
 	private var xjcTaskAlreadyCreated = false
 
 	private fun validateProperties() {
@@ -86,6 +103,8 @@ open class Xjc : DefaultTask() {
 			throw GradleException("Property 'schemaFiles' not set on task $name")
 		}
 	}
+
+	private fun parseCommandLineArgs() = this.additionalXjcCommandLineArgs.map { (k, v) -> "$k $v".trim() }
 
 	/**
 	 * Generates the sources for the schema
@@ -101,19 +120,16 @@ open class Xjc : DefaultTask() {
 		}
 
 		if (!this.xjcTaskAlreadyCreated) {
-			ant.invokeMethod(
-				"taskdef",
-				mapOf(
+			ant.withGroovyBuilder {
+				"taskdef"(
 					"name" to "xjc",
 					"classname" to "com.sun.tools.xjc.XJCTask",
 					"classpath" to project.configurations.getByName("xjc").asPath
 				)
-			)
+			}
 		}
 
 		this.schemaFiles.forEach { schemaFile ->
-			LOGGER.lifecycle("Running XJC compiler for schema $schemaFile")
-
 			val language = if (schemaFile.name.endsWith("wsdl")) "WSDL" else "XMLSCHEMA"
 			val optionsMap = mutableMapOf(
 				"destdir" to this.schemaGenDir.absolutePath,
@@ -130,7 +146,32 @@ open class Xjc : DefaultTask() {
 				optionsMap["binding"] = this.bindingFile
 			}
 
-			ant.invokeMethod("xjc", optionsMap)
+			if (this.additionalXjcOptions.isNotEmpty()) {
+				this.additionalXjcOptions.forEach { (k, v) -> optionsMap.putIfAbsent(k, v)}
+			}
+
+			val commandLineArgs = parseCommandLineArgs()
+
+			LOGGER.lifecycle("Running XJC compiler for schema $schemaFile")
+			LOGGER.lifecycle("\tOptions:")
+			optionsMap.forEach { (k, v) ->
+				LOGGER.lifecycle("\t\t$k = $v")
+			}
+
+			if (commandLineArgs.isNotEmpty()) {
+				LOGGER.lifecycle("\tCommand Line Args:")
+				commandLineArgs.forEach { arg ->
+					LOGGER.lifecycle("\t\t$arg")
+				}
+			}
+
+			ant.withGroovyBuilder {
+				"xjc"(optionsMap) {
+					commandLineArgs.forEach { arg ->
+						"arg"("value" to arg)
+					}
+				}
+			}
 		}
 	}
 }

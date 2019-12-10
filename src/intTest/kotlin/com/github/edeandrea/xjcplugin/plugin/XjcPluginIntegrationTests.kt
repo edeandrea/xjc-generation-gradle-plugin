@@ -22,17 +22,8 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import java.io.File
 
 internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
-	internal data class Schema(
-		val taskName: String,
-		val sourceSetName: String = "main",
-		val packageFolder: String,
-		val schemaRootDir: String = "src/$sourceSetName/schemas/xjc",
-		val expectedOutcome: TaskOutcome = TaskOutcome.SUCCESS
-	)
-
 	private val schemasMap = mapOf(
 		"generateMaven2Schema" to Schema(
 			taskName = "generateMaven2Schema",
@@ -82,7 +73,7 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 					.isEqualTo(expectedOutcome)
 		}
 
-		this.schemasMap.values.forEach(this::verifySchema)
+		this.schemasMap.values.forEach { schema -> verifySchema(schema, this.testDir)}
 	}
 
 	@ParameterizedTest(name = "{index} ==> XJC generation for schema {0} should be correct")
@@ -97,62 +88,6 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 		assertThat(buildResult.task(":xjcGeneration")?.outcome)
 			.isNull()
 
-		verifySchema(schema)
-	}
-
-	private fun mapFilesByName(files: Collection<File>) = files.associateBy { it.name }
-
-	private fun getSourceFileContents(file: File): String {
-		var collectLine = false
-		val lines = file.readLines().map { line ->
-			if (!collectLine && line.startsWith("package ")) {
-				collectLine = true
-			}
-
-			if (collectLine) line else null
-		}.toMutableList()
-
-		lines.removeAll { (it == null) || it.trim().isBlank() }
-		return lines.joinToString(separator = "\n")
-	}
-
-	private fun areFilesAllEqual(actualFiles: List<File>, expectedFiles: List<File>): Boolean {
-		val actualFilesMap = mapFilesByName(actualFiles)
-		var allFilesEqual = true
-		var expectedFileNotEqual: File? = null
-		var actualFileNotEqual: File? = null
-
-		for (file in expectedFiles) {
-			val actualFile = actualFilesMap[file.name]
-
-			if ((actualFile == null) || (getSourceFileContents(file) != getSourceFileContents(actualFile))) {
-				allFilesEqual = false
-				expectedFileNotEqual = file
-				actualFileNotEqual = actualFile
-				break
-			}
-		}
-
-		if (!allFilesEqual) {
-			println("Contents of expected file ${expectedFileNotEqual?.absolutePath} and actual file ${actualFileNotEqual?.absolutePath} aren't the same")
-			println("${expectedFileNotEqual?.absolutePath}:")
-			println(expectedFileNotEqual?.readText())
-			println("------------------------------------------------------")
-			println("${actualFileNotEqual?.absolutePath}:")
-			println(actualFileNotEqual?.readText())
-		}
-
-		return allFilesEqual
-	}
-
-	private fun verifySchema(schema: Schema) {
-		println("Verifying schema $schema")
-		val expectedFilesDir = File("$testDir/expected/${schema.schemaRootDir}/${schema.packageFolder}")
-		val actualSourceFilesDir = File("$testDir/build/generated-sources/${schema.sourceSetName}/xjc/${schema.packageFolder}")
-		val expectedFiles = expectedFilesDir.walkTopDown().filter { it.isFile }.toList()
-		val actualFiles = actualSourceFilesDir.walkTopDown().filter { it.isFile }.toList()
-
-		assertThat(actualFiles).hasSameSizeAs(expectedFiles)
-		assertThat(areFilesAllEqual(actualFiles, expectedFiles)).isTrue()
+		verifySchema(schema, this.testDir)
 	}
 }
