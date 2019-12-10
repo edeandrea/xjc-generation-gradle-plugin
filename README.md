@@ -11,14 +11,14 @@ You can use the `plugins` closure
 **Groovy**
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.1'
+  id 'com.github.edeandrea.xjc-generation' version '1.2'
 }
 ```
 
 **Kotlin**
 ```kotlin
 plugins {
-  id("com.github.edeandrea.xjc-generation") version "1.1"
+  id("com.github.edeandrea.xjc-generation") version "1.2"
 }
 ```
 
