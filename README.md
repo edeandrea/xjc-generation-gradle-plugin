@@ -59,6 +59,7 @@ xjcGeneration {
       schemaFile = null  // A String or File reference that is relative to schemaRootDir containing the location of the file to generate sources from. Only this or schemaDir can be used, not both.
       schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both. Available since version 1.1.
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
+      onePassMode = false // Define if the generation of classes should be performed in one pass (all schema files in the directory together or one by one). If not defined, the files are processed one by one. Available since version 1.3.
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
       generatedOutputRootDir = "$buildDir/generated-sources/$sourceSetName/xjc" // A String or File reference defining the root output directory for generated sources. Available since version 1.3.
       additionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcOptions. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
@@ -131,6 +132,12 @@ xjcGeneration {
       javaPackageName = 'com.github.edeandrea.generated.overriddenoutputdir'
       generatedOutputRootDir = file "$buildDir/generated"  // This could also be generatedOutputRootDir = "$buildDir/generated" 
     }
+
+    someSixthSchema {
+      schemaDir = 'sixth-schemas'
+      schemaRootDir = 'misc/resources/schemas'
+      onePassMode = true
+    }
   }
 }
 ```
@@ -144,6 +151,9 @@ For this example to work you would have the following filesystem layout
             schemas/
                 some-third-schema-1.0/
                     somethirdschema-1.0.xsd
+                sixth-schemas/
+                    somesixthschema1.xsd
+                    somesixthschema2.xsd
     src/
         main/
             schemas/
@@ -198,6 +208,12 @@ After running the generation the output would be
                                 generated/
                                     maven/
                                         All generated .class files for the maven-4.0.0.xsd schema in here
+                        sixthpackage/
+                            generated/
+                                part1/
+                                    All generated .class files for the somesixthschema1.xsd schema in here
+                                part2/
+                                    All generated .class files for the somesixthschema2.xsd schema in here
                         someotherpackage/
                             All generated .class files for some-schema.xsd schema in here
             test/

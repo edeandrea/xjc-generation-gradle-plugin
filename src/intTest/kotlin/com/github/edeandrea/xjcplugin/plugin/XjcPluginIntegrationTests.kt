@@ -50,6 +50,18 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 			sourceSetName = "test",
 			schemaRootDir = "misc/resources/schemas/schemaDirWith2Schemas"
 		),
+		"schemaDirWith2RelatedSchemas" to Schema(
+			taskName = "schemaDirWith2RelatedSchemas",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwith2relatedschemas",
+			sourceSetName = "test",
+			schemaRootDir = "misc/resources/schemas/schemaDirWith2RelatedSchemas"
+		),
+		"schemaDirWith2WSDLs" to Schema(
+			taskName = "schemaDirWith2WSDLs",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwith2wsdls",
+			sourceSetName = "test",
+			schemaRootDir = "misc/resources/schemas/schemaDirWith2WSDLs"
+		),
 		"schemaDirWithNestedFolders" to Schema(
 			taskName = "schemaDirWithNestedFolders",
 			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwithnestedfolders"

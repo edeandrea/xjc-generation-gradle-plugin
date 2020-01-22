@@ -195,22 +195,26 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			.isNotNull()
 			.extracting(
 				"name",
-				"sourceSet"
+				"sourceSet",
+				"onePassMode"
 			)
 			.containsExactly(
 				"schemaGen_some-package1",
-				sourceSets.getByName("main")
+				sourceSets.getByName("main"),
+				false
 			)
 
 		assertThat(xjcTasks.last())
 			.isNotNull()
 			.extracting(
 				"name",
-				"sourceSet"
+				"sourceSet",
+				"onePassMode"
 			)
 			.containsExactly(
 				"schemaGen_some-package2",
-				sourceSets.getByName("test")
+				sourceSets.getByName("test"),
+				false
 			)
 	}
 
@@ -295,6 +299,9 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		assertThat(firstTask.schemaFiles)
 			.isNotEmpty
 			.hasSameElementsAs(project.files("${project.projectDir}/src/main/schemas/xjc/some-schema1.xsd"))
+
+		assertThat(firstTask.onePassMode)
+			.isFalse()
 	}
 
 	@Test
@@ -322,6 +329,36 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		assertThat(firstTask.schemaFiles)
 			.isNotEmpty
 			.hasSameElementsAs(project.files("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
+
+		assertThat(firstTask.onePassMode)
+			.isFalse()
+	}
+
+	@Test
+	fun `One-pass mode is set correctly`() {
+		val schema = Schema("schema1")
+		schema.schemaDir = "some-schemas"
+		schema.javaPackageName = "some.package1"
+		schema.schemaRootDir = "misc/resources/schemas"
+		schema.onePassMode = true
+
+		val project = createProject()
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
+			.isNotNull()
+
+		assertThat(firstTask.onePassMode)
+			.isTrue()
 	}
 
 	@Test

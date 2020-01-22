@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="type.schemadirwith2relatedschemas.generated.xjcplugin.edeandrea.github.com"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns:types="type.schemadirwith2relatedschemas.generated.xjcplugin.edeandrea.github.com">
+	<xs:element name="Id" type="types:Id"/>
+	<xs:complexType name="Id">
+		<xs:sequence/>
+		<xs:attribute name="prefix" use="required" type="xs:normalizedString"/>
+		<xs:attribute name="id" use="required" type="xs:long"/>
+	</xs:complexType>
+
+	<xs:complexType name="GenericTitledElement">
+		<xs:complexContent>
+			<xs:extension base="types:Id">
+				<xs:sequence>
+					<xs:element name="title" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="product.schemadirwith2relatedschemas.generated.xjcplugin.edeandrea.github.com"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns:types="type.schemadirwith2relatedschemas.generated.xjcplugin.edeandrea.github.com">
+	<xs:import namespace="type.schemadirwith2relatedschemas.generated.xjcplugin.edeandrea.github.com" schemaLocation="type.xsd"/>
+
+	<xs:complexType name="Product">
+		<xs:complexContent>
+			<xs:extension base="types:GenericTitledElement">
+				<xs:sequence>
+					<xs:element name="price" type="xs:float"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

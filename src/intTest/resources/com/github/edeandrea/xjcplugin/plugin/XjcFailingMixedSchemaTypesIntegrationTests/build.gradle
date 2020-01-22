@@ -1,0 +1,33 @@
+plugins {
+	id 'com.github.edeandrea.xjc-generation'
+}
+
+ext {
+	jaxbVersion = '2.2.11'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
+	xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+	xjc 'javax.activation:activation:1.1.1'
+
+	// JAX-B dependencies for JDK 9+
+	implementation "javax.xml.bind:jaxb-api:$jaxbVersion"
+}
+
+xjcGeneration {
+	schemas {
+		failingMixedSchemaTypes {
+			taskName = 'failingMixedSchemaTypes'
+			schemaDir = 'schema-dir-with-2-schemas'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.schemadirwith2schemas'
+			onePassMode = true
+		}
+	}
+}
