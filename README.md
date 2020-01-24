@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/edeandrea/xjc-generation-gradle-plugin.svg?branch=master)](https://travis-ci.org/edeandrea/xjc-generation-gradle-plugin)
+![](https://github.com/edeandrea/xjc-generation-gradle-plugin/workflows/Build%20app/badge.svg)
 
 # xjc-generation-gradle-plugin
 A Gradle Plugin for generating JAXB Java sources using the XJC compiler. Under the covers uses the [XJC Ant Task](https://javaee.github.io/jaxb-v2/doc/user-guide/ch04.html#tools-xjc-ant-task).
