@@ -52,9 +52,7 @@
           <emptyLine />
           <package name="org.apache.commons" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="org.springframework" withSubpackages="true" static="false" />
-          <emptyLine />
-          <package name="com.aig.commercial.acid" withSubpackages="true" static="false" />
+          <package name="com.github.edeandrea.xjcplugin" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="" withSubpackages="true" static="false" />
         </value>
@@ -69,6 +67,9 @@
     <Properties>
       <option name="KEEP_BLANK_LINES" value="true" />
     </Properties>
+    <editorconfig>
+      <option name="ENABLED" value="false" />
+    </editorconfig>
     <codeStyleSettings language="DB2">
       <option name="KEEP_LINE_BREAKS" value="false" />
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />

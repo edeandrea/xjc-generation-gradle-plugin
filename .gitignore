@@ -27,6 +27,7 @@
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/sonarlint/issuestore
+.idea/jarRepositories.xml
 
 # Gradle:
 .idea/**/gradle.xml
