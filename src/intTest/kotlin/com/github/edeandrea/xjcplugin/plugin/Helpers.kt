@@ -25,7 +25,8 @@ data class Schema(
 	val sourceSetName: String = "main",
 	val packageFolder: String,
 	val schemaRootDir: String = "src/$sourceSetName/schemas/xjc",
-	val expectedOutcome: TaskOutcome = TaskOutcome.SUCCESS
+	val expectedOutcome: TaskOutcome = TaskOutcome.SUCCESS,
+	val expectedGeneratedOutputRootDir: String = "build/generated-sources/$sourceSetName/xjc"
 )
 
 fun mapFilesByName(files: Collection<File>) = files.associateBy { it.name }
@@ -76,7 +77,7 @@ fun areFilesAllEqual(actualFiles: List<File>, expectedFiles: List<File>): Boolea
 fun verifySchema(schema: Schema, testDir: File) {
 	println("Verifying schema $schema")
 	val expectedFilesDir = File("$testDir/expected/${schema.schemaRootDir}/${schema.packageFolder}")
-	val actualSourceFilesDir = File("$testDir/build/generated-sources/${schema.sourceSetName}/xjc/${schema.packageFolder}")
+	val actualSourceFilesDir = File("$testDir/${schema.expectedGeneratedOutputRootDir}/${schema.packageFolder}")
 	val expectedFiles = expectedFilesDir.walkTopDown().filter { it.isFile }.toList()
 	val actualFiles = actualSourceFilesDir.walkTopDown().filter { it.isFile }.toList()
 

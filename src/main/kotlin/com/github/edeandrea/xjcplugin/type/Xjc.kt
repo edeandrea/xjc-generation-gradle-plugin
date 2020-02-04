@@ -129,7 +129,9 @@ open class Xjc : DefaultTask() {
 			}
 		}
 
-		this.schemaFiles.forEach { schemaFile ->
+		this.schemaFiles
+			.sorted()
+			.forEach { schemaFile ->
 			val language = if (schemaFile.name.endsWith("wsdl")) "WSDL" else "XMLSCHEMA"
 			val optionsMap = mutableMapOf(
 				"destdir" to this.schemaGenDir.absolutePath,

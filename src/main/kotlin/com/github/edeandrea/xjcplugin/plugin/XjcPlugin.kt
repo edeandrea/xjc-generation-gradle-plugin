@@ -76,24 +76,26 @@ class XjcPlugin : Plugin<Project> {
 			val sourceSet = sourceSets.getByName(sourceSetName)
 			val schemaRootDir = schema.schemaRootDir ?: "${project.projectDir}/src/$sourceSetName/schemas/xjc"
 			val schemaFiles = getSchemaFiles(project, schemaRootDir, schema, schemaDirBlank)
-			val generatedSourcesDir = "${project.buildDir}/generated-sources/$sourceSetName/xjc"
+			val generatedSourcesDir = schema.generatedOutputRootDir ?: "${project.buildDir}/generated-sources/$sourceSetName/xjc"
 			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
 			val taskDesc = schema.description ?: "Generate sources for the schema ${schema.name}"
 			val additionalXjcOptions = xjcExtension.defaultAdditionalXjcOptions.plus(schema.additionalXjcOptions)
 			val additionalXjcCommandLineArgs = xjcExtension.defaultAdditionalXjcCommandLineArgs.plus(schema.additionalXjcCommandLineArgs)
 
-			log.info("------------------------------------------")
-			log.info("taskName = $taskName")
-			log.info("sourceSetName = $sourceSetName")
-			log.info("schemaRootDir = $schemaRootDir")
-			log.info("generatedSourcesDir = $generatedSourcesDir")
-			log.info("bindingFile = $bindingFile")
-			log.info("taskDesc = $taskDesc")
-			log.info("additionalXjcOptions = $additionalXjcOptions")
-			log.info("additionalXjcCommandLineArgs = $additionalXjcCommandLineArgs")
-			log.info("schemaFiles =")
-			schemaFiles.files.map(File::getPath).forEach(log::info)
-			log.info("------------------------------------------")
+			if (log.isInfoEnabled) {
+				log.info("------------------------------------------")
+				log.info("taskName = $taskName")
+				log.info("sourceSetName = $sourceSetName")
+				log.info("schemaRootDir = $schemaRootDir")
+				log.info("generatedSourcesDir = $generatedSourcesDir")
+				log.info("bindingFile = $bindingFile")
+				log.info("taskDesc = $taskDesc")
+				log.info("additionalXjcOptions = $additionalXjcOptions")
+				log.info("additionalXjcCommandLineArgs = $additionalXjcCommandLineArgs")
+				log.info("schemaFiles =")
+				schemaFiles.files.map(File::getPath).forEach(log::info)
+				log.info("------------------------------------------")
+			}
 
 			sourceSet.java.srcDir(generatedSourcesDir)
 
