@@ -53,6 +53,18 @@ internal class XjcPluginIntegrationTests : AbstractIntegrationTests() {
 		"schemaDirWithNestedFolders" to Schema(
 			taskName = "schemaDirWithNestedFolders",
 			packageFolder = "com/github/edeandrea/xjcplugin/generated/schemadirwithnestedfolders"
+		),
+		"schemaWithOverriddenOutputRootDir" to Schema(
+			taskName = "schemaWithOverriddenOutputRootDir",
+			sourceSetName = "intTest",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/overriddenoutputroot",
+			expectedGeneratedOutputRootDir = "build/generated-output"
+		),
+		"schemaWithOverriddenOutputRootDirFile" to Schema(
+			taskName = "schemaWithOverriddenOutputRootDirFile",
+			sourceSetName = "intTest",
+			packageFolder = "com/github/edeandrea/xjcplugin/generated/overriddenoutputrootfile",
+			expectedGeneratedOutputRootDir = "build/generated-output"
 		)
 	)
 

@@ -18,6 +18,10 @@ dependencies {
 	xjc 'javax.activation:activation:1.1.1'
 }
 
+sourceSets {
+	intTest
+}
+
 xjcGeneration {
 	defaultBindingFile = file 'src/main/schemas/xjc/xjc.xjb.xml'
 
@@ -58,6 +62,22 @@ xjcGeneration {
 			taskName = 'schemaDirWithNestedFolders'
 			schemaDir = 'schemaDirWithNestedFolders/root'
 			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.schemadirwithnestedfolders'
+		}
+
+		schemaWithOverriddenOutputRootDir {
+			taskName = 'schemaWithOverriddenOutputRootDir'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.overriddenoutputroot'
+			schemaFile = 'maven-4.0/maven-4.0.xsd'
+			sourceSet = 'intTest'
+			generatedOutputRootDir = "$buildDir/generated-output"
+		}
+
+		schemaWithOverriddenOutputRootDirFile {
+			taskName = 'schemaWithOverriddenOutputRootDirFile'
+			javaPackageName = 'com.github.edeandrea.xjcplugin.generated.overriddenoutputrootfile'
+			schemaFile = 'artifactory.xsd'
+			sourceSet = 'intTest'
+			generatedOutputRootDir = file "$buildDir/generated-output"
 		}
 	}
 }

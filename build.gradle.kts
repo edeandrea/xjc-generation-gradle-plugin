@@ -86,6 +86,7 @@ dependencies {
 	testImplementation("org.assertj:assertj-core:3.14.0")
 	testImplementation(kotlin("test-junit5"))
 	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+	testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 	intTestImplementation("org.assertj:assertj-core:3.14.0")
 	intTestImplementation(kotlin("test-junit5"))

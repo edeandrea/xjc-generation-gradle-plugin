@@ -121,6 +121,12 @@ class Schema(val name: String) {
 	var additionalXjcCommandLineArgs: Map<String, String> = mutableMapOf()
 
 	/**
+	 * The root directory for generated source output
+	 * @since 1.3
+	 */
+	var generatedOutputRootDir: String? = null
+
+	/**
 	 * Override for setting the [schemaFile] as a [File]
 	 * @param schemaFile The [File] reference to the [schemaFile]
 	 */
@@ -152,5 +158,14 @@ class Schema(val name: String) {
 	 */
 	fun setBindingFile(bindingFile: File) {
 		this.bindingFile = bindingFile.absolutePath
+	}
+
+	/**
+	 * Override for setting the *generatedSourcesOutputRootDir* as a [File]
+	 * @param generatedOutputRootDir The [File] reference to the *generatedSourcesOutputRootDir*
+	 * @since 1.3
+	 */
+	fun setGeneratedOutputRootDir(generatedOutputRootDir: File) {
+		this.generatedOutputRootDir = generatedOutputRootDir.absolutePath
 	}
 }

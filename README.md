@@ -60,6 +60,7 @@ xjcGeneration {
       schemaDir = null  // A String or File reference that is relative to schemaRootDir containing a folder to generate sources from. This folder is searched recursively and all files found are used.  Only this or schemaFile can be used, not both. Available since version 1.1.
       sourceSet = null  // The name of the source set for this schema. If null or empty, the default source set will be used
       taskName = null  // Optionally define a task name to be used for the generation of this schema. If null or empty a default one will be created
+      generatedOutputRootDir = "$buildDir/generated-sources/$sourceSetName/xjc" // A String or File reference defining the root output directory for generated sources. Available since version 1.3.
       additionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcOptions. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
       additionalXjcCommandLineArgs = [:]  // A Map containing additional command line args to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcCommandLineArgs. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
     }
@@ -124,6 +125,12 @@ xjcGeneration {
       additionalXjcOptions = ['encoding': 'EUC-JP']
       additionalXjcCommandLineArgs = ['-verbose': '']
     }
+    
+   overriddenOutputDir {
+      schemaFile = 'another-schema-1.0/another-schema-1.0.xsd'
+      javaPackageName = 'com.github.edeandrea.generated.overriddenoutputdir'
+      generatedOutputRootDir = file "$buildDir/generated"  // This could also be generatedOutputRootDir = "$buildDir/generated" 
+    }
   }
 }
 ```
@@ -141,6 +148,8 @@ For this example to work you would have the following filesystem layout
         main/
             schemas/
                 xjc/
+                    another-schema-1.0/
+                        another-schema-1.0.xsd
                     maven-4.0/
                         maven-4.0.0.xsd
                     some-other-schema-dir/
@@ -165,6 +174,13 @@ After running the generation the output would be
 ```
 /
     ${buildDir}/
+        generated/
+            com/
+                github/
+                    edeandrea/
+                        generated/
+                            overriddenoutputdir/
+                                All generated .class files for the another-schema-1.0.xsd in here
         generated-sources/
             main/
                 xjc/

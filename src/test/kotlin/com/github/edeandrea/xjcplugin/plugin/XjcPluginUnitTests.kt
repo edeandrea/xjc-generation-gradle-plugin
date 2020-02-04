@@ -104,7 +104,13 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 		addSchemas(project, schema)
 		runProjectAfterEvaluate(project)
 
-		assertThat(getXjcTasks(project).size).isEqualTo(1)
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks.size).isEqualTo(1)
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("schemaGenDir")
+			.isEqualTo(project.file("${project.buildDir}/generated-sources/main/xjc"))
 		assertThat(project.tasks.findByName("schemaGen_some-package")).isNotNull()
 	}
 
@@ -398,5 +404,26 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 				"encoding" to "UTF-8",
 				"extension" to ""
 			))
+	}
+
+	@Test
+	fun `Overridden generatedSourcesOutputRootDir`() {
+		val schema1 = Schema("someSchema")
+		schema1.schemaFile = "some-schema.xsd"
+		schema1.javaPackageName = "some.package"
+		schema1.generatedOutputRootDir = "some/other/dir"
+
+		val project = createProject()
+		addSchemas(project, schema1)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks.size).isEqualTo(1)
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("schemaGenDir")
+			.isEqualTo(project.file("some/other/dir"))
+		assertThat(project.tasks.findByName("schemaGen_some-package")).isNotNull()
 	}
 }
