@@ -78,7 +78,7 @@ For each individual schema, the generation of that schema will happen prior to t
 
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.2'
+  id 'com.github.edeandrea.xjc-generation' version '1.3'
 }
 
 ext {
