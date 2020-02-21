@@ -58,6 +58,23 @@ xjcGeneration {
 			sourceSet = 'test'
 		}
 
+		schemaDirWith2RelatedSchemas {
+			taskName = 'schemaDirWith2RelatedSchemas'
+			bindingFile = 'misc/resources/schemas/schema-dir-with-2-related-schemas/xjb/bindings.xjb'
+			schemaDir = 'schema-dir-with-2-related-schemas/xsd'
+			schemaRootDir = 'misc/resources/schemas'
+			onePassMode = true
+			sourceSet = 'test'
+		}
+
+		schemaDirWith2WSDLs {
+			taskName = 'schemaDirWith2WSDLs'
+			schemaDir = 'schema-dir-with-2-wsdls'
+			schemaRootDir = 'misc/resources/schemas'
+			onePassMode = true
+			sourceSet = 'test'
+		}
+
 		schemaDirWithNestedFolders {
 			taskName = 'schemaDirWithNestedFolders'
 			schemaDir = 'schemaDirWithNestedFolders/root'

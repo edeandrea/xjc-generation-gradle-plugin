@@ -1,0 +1,284 @@
+<?xml version="1.0" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="buildArtifactsRequest" type="buildArtifactsRequest"/>
+
+  <xs:complexType name="xrayRepoModel">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="pkgType" type="xs:string" minOccurs="0"/>
+          <xs:element name="type" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="baseModel">
+    <xs:sequence>
+      <xs:element name="feedbackMsg" type="feedbackMsg" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="feedbackMsg">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="error" type="xs:string" minOccurs="0"/>
+          <xs:element name="errors" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="info" type="xs:string" minOccurs="0"/>
+          <xs:element name="url" type="xs:string" minOccurs="0"/>
+          <xs:element name="warn" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="aqlUISearchModel">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="generalTabLicenseModel">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="approved" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="url" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="deleteArtifactVersion">
+    <xs:complexContent>
+      <xs:extension base="baseArtifact">
+        <xs:sequence>
+          <xs:element name="directoriesCount" type="xs:int" minOccurs="0"/>
+          <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+          <xs:element name="repoPaths" type="repoKeyPath" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="version" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="baseArtifact">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="param" type="xs:string" minOccurs="0"/>
+          <xs:element name="path" type="xs:string" minOccurs="0"/>
+          <xs:element name="repoKey" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="repoKeyPath">
+    <xs:sequence>
+      <xs:element name="path" type="xs:string" minOccurs="0"/>
+      <xs:element name="repoKey" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="baseSearchResult" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="actions" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="downloadLink" type="xs:string" minOccurs="0"/>
+          <xs:element name="modifiedDate" type="xs:long"/>
+          <xs:element name="modifiedString" type="xs:string" minOccurs="0"/>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="repoKey" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="replicationRequest">
+    <xs:sequence>
+      <xs:element name="delete" type="xs:boolean"/>
+      <xs:element name="password" type="xs:string" minOccurs="0"/>
+      <xs:element name="properties" type="xs:boolean"/>
+      <xs:element name="proxy" type="xs:string" minOccurs="0"/>
+      <xs:element name="url" type="xs:string" minOccurs="0"/>
+      <xs:element name="username" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="buildPatternArtifacts">
+    <xs:sequence>
+      <xs:element name="buildName" type="xs:string" minOccurs="0"/>
+      <xs:element name="buildNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="patternResults" type="patternResult" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="started" type="xs:string" minOccurs="0"/>
+      <xs:element name="url" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="patternResult">
+    <xs:sequence>
+      <xs:element name="patternArtifacts" type="patternArtifact" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="patternArtifact">
+    <xs:sequence>
+      <xs:element name="artifactoryUrl" type="xs:string" minOccurs="0"/>
+      <xs:element name="lastModified" type="xs:string" minOccurs="0"/>
+      <xs:element name="sha1" type="xs:string" minOccurs="0"/>
+      <xs:element name="size" type="xs:long"/>
+      <xs:element name="uri" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="buildArtifactsRequest">
+    <xs:sequence>
+      <xs:element name="archiveType" type="xs:string" minOccurs="0"/>
+      <xs:element name="buildName" type="xs:string" minOccurs="0"/>
+      <xs:element name="buildNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="buildStatus" type="xs:string" minOccurs="0"/>
+      <xs:element name="mappings" type="buildArtifactsMapping" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="repos" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="buildArtifactsMapping">
+    <xs:sequence>
+      <xs:element name="input" type="xs:string" minOccurs="0"/>
+      <xs:element name="output" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="userProfileModel">
+    <xs:complexContent>
+      <xs:extension base="baseModel">
+        <xs:sequence>
+          <xs:element name="apiKey" type="xs:string" minOccurs="0"/>
+          <xs:element name="userName" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="repoDetails">
+    <xs:sequence>
+      <xs:element name="configuration" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="key" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="repoDetailsType" minOccurs="0"/>
+      <xs:element name="url" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="crowdGroupModel">
+    <xs:complexContent>
+      <xs:extension base="crowdExtGroup">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="crowdExtGroup">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="existsInArtifactory" type="xs:boolean"/>
+      <xs:element name="groupName" type="xs:string" minOccurs="0"/>
+      <xs:element name="importIntoArtifactory" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="module">
+    <xs:complexContent>
+      <xs:extension base="baseBuildBean">
+        <xs:sequence>
+          <xs:element name="artifacts" type="artifact" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="dependencies" type="dependency" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="excludedArtifacts" type="artifact" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="id" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="baseBuildBean" abstract="true">
+    <xs:sequence>
+      <xs:element name="properties">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:anyType"/>
+                  <xs:element name="value" minOccurs="0" type="xs:anyType"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="artifact">
+    <xs:complexContent>
+      <xs:extension base="baseBuildFileBean">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="baseBuildFileBean" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="baseBuildBean">
+        <xs:sequence>
+          <xs:element name="md5" type="xs:string" minOccurs="0"/>
+          <xs:element name="sha1" type="xs:string" minOccurs="0"/>
+          <xs:element name="type" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dependency">
+    <xs:complexContent>
+      <xs:extension base="baseBuildFileBean">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string" minOccurs="0"/>
+          <xs:element name="requiredBy" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="scopes" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="buildPatternArtifactsRequest">
+    <xs:sequence>
+      <xs:element name="buildName" type="xs:string" minOccurs="0"/>
+      <xs:element name="buildNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="patterns" type="pattern" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="transitive" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pattern">
+    <xs:sequence>
+      <xs:element name="pattern" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="repoDetailsType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LOCAL"/>
+      <xs:enumeration value="REMOTE"/>
+      <xs:enumeration value="VIRTUAL"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

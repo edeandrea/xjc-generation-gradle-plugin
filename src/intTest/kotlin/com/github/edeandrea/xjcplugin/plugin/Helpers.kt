@@ -29,7 +29,7 @@ data class Schema(
 	val expectedGeneratedOutputRootDir: String = "build/generated-sources/$sourceSetName/xjc"
 )
 
-fun mapFilesByName(files: Collection<File>) = files.associateBy { it.name }
+fun mapFilesByName(parentDir: File, files: Collection<File>) = files.associateBy { it.relativeTo(parentDir).path }
 
 fun getSourceFileContents(file: File): String {
 	var collectLine = false
@@ -45,14 +45,15 @@ fun getSourceFileContents(file: File): String {
 	return lines.joinToString(separator = "\n")
 }
 
-fun areFilesAllEqual(actualFiles: List<File>, expectedFiles: List<File>): Boolean {
-	val actualFilesMap = mapFilesByName(actualFiles)
+fun areFilesAllEqual(actualSourceFilesDir: File, actualFiles: List<File>, expectedFilesDir: File, expectedFiles: List<File>): Boolean {
+	val actualFilesMap = mapFilesByName(actualSourceFilesDir, actualFiles)
 	var allFilesEqual = true
 	var expectedFileNotEqual: File? = null
 	var actualFileNotEqual: File? = null
 
 	for (file in expectedFiles) {
-		val actualFile = actualFilesMap[file.name]
+		val fileRelativePath = file.relativeTo(expectedFilesDir)
+		val actualFile = actualFilesMap[fileRelativePath.path]
 
 		if ((actualFile == null) || (getSourceFileContents(file) != getSourceFileContents(actualFile))) {
 			allFilesEqual = false
@@ -82,5 +83,5 @@ fun verifySchema(schema: Schema, testDir: File) {
 	val actualFiles = actualSourceFilesDir.walkTopDown().filter { it.isFile }.toList()
 
 	assertThat(actualFiles).hasSameSizeAs(expectedFiles)
-	assertThat(areFilesAllEqual(actualFiles, expectedFiles)).isTrue()
+	assertThat(areFilesAllEqual(actualSourceFilesDir, actualFiles, expectedFilesDir, expectedFiles)).isTrue()
 }

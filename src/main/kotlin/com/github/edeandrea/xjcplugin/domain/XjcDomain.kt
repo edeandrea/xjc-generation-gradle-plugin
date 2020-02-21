@@ -109,6 +109,12 @@ class Schema(val name: String) {
 	var schemaDir: String? = null
 
 	/**
+	 * Indicates if the schema files should be processed by xjc in one pass or one by one.
+	 * @since 1.3
+	 */
+	var onePassMode: Boolean = false
+
+	/**
 	 * Any additional xjc options to be passed to xjc
 	 * @since 1.2
 	 */

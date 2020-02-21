@@ -75,6 +75,7 @@ class XjcPlugin : Plugin<Project> {
 			val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
 			val sourceSet = sourceSets.getByName(sourceSetName)
 			val schemaRootDir = schema.schemaRootDir ?: "${project.projectDir}/src/$sourceSetName/schemas/xjc"
+			val onePassMode = schema.onePassMode
 			val schemaFiles = getSchemaFiles(project, schemaRootDir, schema, schemaDirBlank)
 			val generatedSourcesDir = schema.generatedOutputRootDir ?: "${project.buildDir}/generated-sources/$sourceSetName/xjc"
 			val bindingFile = if (schema.bindingFile != null) project.file("${project.projectDir}/${schema.bindingFile}") else xjcExtension.defaultBindingFile
@@ -87,6 +88,7 @@ class XjcPlugin : Plugin<Project> {
 				log.info("taskName = $taskName")
 				log.info("sourceSetName = $sourceSetName")
 				log.info("schemaRootDir = $schemaRootDir")
+				log.info("onePassMode = $onePassMode")
 				log.info("generatedSourcesDir = $generatedSourcesDir")
 				log.info("bindingFile = $bindingFile")
 				log.info("taskDesc = $taskDesc")
@@ -101,7 +103,9 @@ class XjcPlugin : Plugin<Project> {
 
 			val xjcTask = project.tasks.create(taskName, Xjc::class.java) {
 				it.description = taskDesc
+				it.onePassMode = onePassMode
 				it.schemaFiles = schemaFiles
+				it.schemaRootDir = project.file(schemaRootDir)
 				it.javaPackageName = schema.javaPackageName
 				it.sourceSet = sourceSet
 				it.bindingFile = bindingFile
