@@ -25,22 +25,37 @@ plugins {
 ## Configuration
 The plugin creates a new configuration called `xjc` which you need to wire in the necessary dependencies for the JAXB API itself as well as the XJC compiler.
 
+**Groovy**
 ```groovy
 ext {
 	jaxbVersion = '2.2.11'
 }
 
 dependencies {
-	xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
-	xjc 'javax.activation:activation:1.1.1'
+  xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
+  xjc "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
+  xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
+  xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+  xjc 'javax.activation:activation:1.1.1'
+}
+```
+
+**Kotlin**
+```kotlin
+val jaxbVersion by extra { "2.2.11" }
+
+dependencies {
+  "xjc"("javax.xml.bind:jaxb-api:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-xjc:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-core:$jaxbVersion")
+  "xjc"("javax.activation:activation:1.1.1")
 }
 ```
 
 Once that's done you can configure the `xjcGeneration` DSL as shown below. All the configuration options are shown with their default values.
 
+**Groovy**
 ```groovy
 xjcGeneration {
   defaultBindingFile = null  // A File reference to a default binding file to be used for all schemas
@@ -64,6 +79,33 @@ xjcGeneration {
       generatedOutputRootDir = "$buildDir/generated-sources/$sourceSet/xjc" // A String or File reference defining the root output directory for generated sources. Available since version 1.3.
       additionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcOptions. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
       additionalXjcCommandLineArgs = [:]  // A Map containing additional command line args to pass to xjc for this schema. Any options here will override anything in defaultAdditionalXjcCommandLineArgs. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
+    }
+  }
+}
+```
+
+**Kotlin**
+```kotlin
+xjcGeneration {
+  defaultBindingFile = null
+  defaultSourceSet = "main"
+  defaultAdditionalXjcOptions = mapOf()
+  defaultAdditionalXjcCommandLineArgs = mapOf()
+
+  schemas {
+    create("myschema") {
+      bindingFile = null
+      description = null
+      javaPackageName = ""
+      schemaRootDir = "$projectDir/src/$sourceSet/schemas/xjc"
+      schemaFile = null
+      schemaDir = null
+      sourceSet = null
+      onePassMode = false
+      taskName = null
+      generatedOutputRootDir = "$buildDir/generated-sources/$sourceSet/xjc"
+      additionalXjcOptions = mapOf()
+      additionalXjcCommandLineArgs = mapOf()
     }
   }
 }
