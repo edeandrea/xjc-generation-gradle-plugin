@@ -28,7 +28,7 @@ The plugin creates a new configuration called `xjc` which you need to wire in th
 **Groovy**
 ```groovy
 ext {
-	jaxbVersion = '2.2.11'
+  jaxbVersion = '2.2.11'
 }
 
 dependencies {
