@@ -118,6 +118,7 @@ For each individual schema, the generation of that schema will happen prior to t
 ## Example Usage
 `build.gradle` file
 
+**Groovy**
 ```groovy
 plugins {
   id 'com.github.edeandrea.xjc-generation' version '1.3'
@@ -178,6 +179,71 @@ xjcGeneration {
     someSixthSchema {
       schemaDir = 'sixth-schemas'
       schemaRootDir = 'misc/resources/schemas'
+      onePassMode = true
+    }
+  }
+}
+```
+
+**Kotlin**
+```kotlin
+plugins {
+  id("com.github.edeandrea.xjc-generation") version "1.3"
+}
+
+val jaxbVersion by extra { "2.2.11" }
+
+dependencies {
+  "xjc"("javax.xml.bind:jaxb-api:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-xjc:$jaxbVersion")
+  "xjc"("com.sun.xml.bind:jaxb-core:$jaxbVersion")
+  "xjc"("javax.activation:activation:1.1.1")
+}
+
+xjcGeneration {
+  defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
+  defaultBindingFile = file("src/main/schemas/xjc/xjc.xjb.xml")
+    
+  schemas {
+    create("maven") {
+      schemaFile = "maven-4.0/maven-4.0.0.xsd"
+      javaPackageName = "com.github.edeandrea.generated.maven"
+    }
+  
+    create("anotherSchema") {
+      schemaFile = "some-other-schema-1.0/someschema-1.0.wsdl"
+      javaPackageName = "com.somecompany.someschema.generated"
+      sourceSet = "test"
+    }
+ 
+    create("someThirdSchema") {
+      schemaFile = "some-third-schema-1.0/somethirdschema-1.0.xsd"
+      javaPackageName = "com.anothercompany.somethirdpackage.generated"
+      schemaRootDir = "misc/resources/schemas"
+    }
+
+    create("someFourthSchema") {
+      schemaDir = "some-schema-dir"
+      javaPackageName = "com.fourthcompany.somepackage.generated"
+    }
+
+    create("someFifthSchema") {
+      schemaFile = "some-other-schema-dir/some-schema.xsd"
+      javaPackageName = "com.someotherpackage"
+      additionalXjcOptions = mapOf("encoding" to "EUC-JP")
+      additionalXjcCommandLineArgs = mapOf("-verbose" to "")
+    }
+ 
+    create("overriddenOutputDir") {
+      schemaFile = "another-schema-1.0/another-schema-1.0.xsd"
+      javaPackageName = "com.github.edeandrea.generated.overriddenoutputdir"
+      generatedOutputRootDir = file("$buildDir/generated")  // This could also be generatedOutputRootDir = "$buildDir/generated"
+    }
+
+    create("someSixthSchema") {
+      schemaDir = "sixth-schemas"
+      schemaRootDir = "misc/resources/schemas"
       onePassMode = true
     }
   }
