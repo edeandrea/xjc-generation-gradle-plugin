@@ -116,9 +116,7 @@ You want to place your schema files in the `src/${sourceSet}/schemas/xjc` folder
 For each individual schema, the generation of that schema will happen prior to the `compile` task for the particular source set the schema is tied to (i.e. schemas for the `main` source set will happen before the `compileJava` task, schemas for the `test` source set will happen before the `compileTestJava` task(. There is also a single task called `xjcGeneration` that is introduced which will run the generation for all schemas.
 
 ## Example Usage
-`build.gradle` file
-
-**Groovy**
+**Groovy** `build.gradle` file
 ```groovy
 plugins {
   id 'com.github.edeandrea.xjc-generation' version '1.3'
@@ -185,7 +183,7 @@ xjcGeneration {
 }
 ```
 
-**Kotlin**
+**Kotlin** `build.gradle.kts` file
 ```kotlin
 plugins {
   id("com.github.edeandrea.xjc-generation") version "1.3"
