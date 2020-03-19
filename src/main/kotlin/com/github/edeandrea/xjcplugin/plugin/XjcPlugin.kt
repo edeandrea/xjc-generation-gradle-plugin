@@ -114,8 +114,30 @@ class XjcPlugin : Plugin<Project> {
 				it.additionalXjcCommandLineArgs = additionalXjcCommandLineArgs
 			}
 
-			val sourceSetNameTaskName = if (sourceSetName == "main") "compileJava" else "compile${sourceSetName.capitalize()}Java"
-			project.tasks.getByName(sourceSetNameTaskName).dependsOn(xjcTask)
+			linkTasksToPreCompile(sourceSetName, project, xjcTask)
+		}
+	}
+
+	private fun linkTaskToPreCompile(sourceSetName: String, project: Project, xjcTask: Xjc, language: String) {
+		val sourceSetNameTaskName = if (sourceSetName == "main") "compile${language}" else "compile${sourceSetName.capitalize()}${language}"
+		project.tasks.getByName(sourceSetNameTaskName).dependsOn(xjcTask)
+	}
+
+	private fun linkTasksToPreCompile(sourceSetName: String, project: Project, xjcTask: Xjc) {
+		project.pluginManager.withPlugin("java") {
+			linkTaskToPreCompile(sourceSetName, project, xjcTask, "Java")
+		}
+
+		project.pluginManager.withPlugin("groovy") {
+			linkTaskToPreCompile(sourceSetName, project, xjcTask, "Groovy")
+		}
+
+		project.pluginManager.withPlugin("scala") {
+			linkTaskToPreCompile(sourceSetName, project, xjcTask, "Scala")
+		}
+
+		project.pluginManager.withPlugin("kotlin") {
+			linkTaskToPreCompile(sourceSetName, project, xjcTask, "Kotlin")
 		}
 	}
 

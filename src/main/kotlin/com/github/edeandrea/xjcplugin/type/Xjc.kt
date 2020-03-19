@@ -159,7 +159,7 @@ open class Xjc : DefaultTask() {
 	}
 
 	private fun processXjc(language: String, schemaFile: File?, schemaFiles: FileCollection?) {
-		val optionsMap = mutableMapOf(
+		val optionsMap: MutableMap<String, Any> = mutableMapOf(
 			"destdir" to this.schemaGenDir.absolutePath,
 			"extension" to true,
 			"language" to language
@@ -170,7 +170,7 @@ open class Xjc : DefaultTask() {
 		}
 
 		if (this.bindingFile != null) {
-			optionsMap["binding"] = this.bindingFile
+			optionsMap["binding"] = this.bindingFile!!
 		}
 
 		if (this.additionalXjcOptions.isNotEmpty()) {
