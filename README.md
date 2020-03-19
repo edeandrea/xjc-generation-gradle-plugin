@@ -11,14 +11,14 @@ You can use the `plugins` closure
 **Groovy**
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.3'
+  id 'com.github.edeandrea.xjc-generation' version '1.4'
 }
 ```
 
 **Kotlin**
 ```kotlin
 plugins {
-  id("com.github.edeandrea.xjc-generation") version "1.3"
+  id("com.github.edeandrea.xjc-generation") version "1.4"
 }
 ```
 
@@ -119,7 +119,7 @@ For each individual schema, the generation of that schema will happen prior to t
 **Groovy** `build.gradle` file
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.3'
+  id 'com.github.edeandrea.xjc-generation' version '1.4'
 }
 
 ext {
@@ -186,7 +186,7 @@ xjcGeneration {
 **Kotlin** `build.gradle.kts` file
 ```kotlin
 plugins {
-  id("com.github.edeandrea.xjc-generation") version "1.3"
+  id("com.github.edeandrea.xjc-generation") version "1.4"
 }
 
 val jaxbVersion by extra { "2.2.11" }

@@ -28,6 +28,9 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskCollection
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 internal class XjcPluginUnitTests : AbstractUnitTests() {
@@ -463,4 +466,60 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 			.isEqualTo(project.file("some/other/dir"))
 		assertThat(project.tasks.findByName("schemaGen_some-package")).isNotNull()
 	}
+
+	@ParameterizedTest(name = "{index} ==> Correct task dependencies for plugin ''{0}'' for source set ''{1}''")
+	@MethodSource("compileTaskDependencies")
+	fun `Correct dependencies from compile task`(pluginToApply: String, sourceSet: String, expectedCompileTaskName: String) {
+		val schema = Schema("schema1")
+		schema.schemaFile = "some-schema1.xsd"
+		schema.javaPackageName = "some.package1"
+		schema.schemaRootDir = "misc/resources/schemas"
+		schema.sourceSet = sourceSet
+		schema.taskName = "schemaTask"
+
+		val project = createProject()
+		project.pluginManager.apply(pluginToApply)
+		project.configurations.maybeCreate(sourceSet)
+		project.extensions.getByType(SourceSetContainer::class.java).maybeCreate(sourceSet)
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks)
+			.isNotEmpty
+			.hasSize(1)
+
+		val firstTask = xjcTasks.first()
+
+		assertThat(firstTask)
+			.isNotNull()
+
+		assertThat(firstTask.schemaFiles)
+			.isNotEmpty()
+			.hasSameElementsAs(project.files("${project.projectDir}/misc/resources/schemas/some-schema1.xsd"))
+
+		assertThat(firstTask.onePassMode)
+			.isFalse()
+
+		val expectedCompileTask = project.tasks.getByName(expectedCompileTaskName)
+		assertThat(expectedCompileTask)
+			.isNotNull()
+
+		assertThat(expectedCompileTask.dependsOn)
+			.isNotEmpty()
+			.hasSize(1)
+			.containsOnly(firstTask)
+	}
+
+	fun compileTaskDependencies() =
+		listOf("java", "kotlin", "scala", "groovy")
+			.map { plugin ->
+				listOf(
+					Arguments.of(plugin, "main", "compile${plugin.capitalize()}"),
+					Arguments.of(plugin, "test", "compileTest${plugin.capitalize()}"),
+					Arguments.of(plugin, "other", "compileOther${plugin.capitalize()}")
+				)
+			}
+			.flatten()
 }

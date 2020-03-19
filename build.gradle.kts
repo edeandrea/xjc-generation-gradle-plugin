@@ -21,7 +21,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 val junitVersion by extra { "5.5.2" }
 
 group = "com.github.edeandrea"
-version = "1.4"
+version = "1.5"
 
 sourceSets {
 	create("intTest") {
@@ -87,6 +87,7 @@ dependencies {
 	testImplementation(kotlin("test-junit5"))
 	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 	testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
+	testImplementation(kotlin("gradle-plugin"))
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 	intTestImplementation("org.assertj:assertj-core:3.14.0")
 	intTestImplementation(kotlin("test-junit5"))
