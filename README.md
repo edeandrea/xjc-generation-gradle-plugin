@@ -23,9 +23,9 @@ plugins {
 ```
 
 ## Configuration
-The plugin creates a new configuration called `xjc` which you need to wire in the necessary dependencies for the JAXB API itself as well as the XJC compiler.
+The plugin creates a new configuration called `xjc` which you need to wire in the necessary dependencies for the JAXB API itself as well as the XJC compiler. **NOTE:** The dependencies you use will depend on the JAXB version you are using.
 
-**Groovy**
+**Groovy - JAXB 2.2.x**
 ```groovy
 ext {
   jaxbVersion = '2.2.11'
@@ -40,7 +40,20 @@ dependencies {
 }
 ```
 
-**Kotlin**
+**Groovy - JAXB 2.3.x**
+```groovy
+ext {
+  jaxbVersion = '2.3.1'
+}
+
+dependencies {
+  xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
+  xjc "org.glassfish.jaxb:jaxb-runtime:$jaxbVersion"
+  xjc "org.glassfish.jaxb:jaxb-xjc:$jaxbVersion"
+}
+```
+
+**Kotlin - JAXB 2.2.x**
 ```kotlin
 val jaxbVersion by extra { "2.2.11" }
 
@@ -50,6 +63,17 @@ dependencies {
   "xjc"("com.sun.xml.bind:jaxb-xjc:$jaxbVersion")
   "xjc"("com.sun.xml.bind:jaxb-core:$jaxbVersion")
   "xjc"("javax.activation:activation:1.1.1")
+}
+```
+
+**Kotlin - JAXB 2.3.x**
+```kotlin
+val jaxbVersion by extra { "2.3.1" }
+
+dependencies {
+  "xjc"("javax.xml.bind:jaxb-api:$jaxbVersion")
+  "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
+  "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
 }
 ```
 
