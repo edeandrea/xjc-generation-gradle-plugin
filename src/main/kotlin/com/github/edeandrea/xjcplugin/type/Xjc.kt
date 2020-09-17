@@ -180,15 +180,15 @@ open class Xjc : DefaultTask() {
 		val commandLineArgs = parseCommandLineArgs()
 
 		LOGGER.lifecycle("Running XJC compiler for schema(s) ${schemaFile ?: schemaFiles?.asPath}")
-		LOGGER.lifecycle("\tOptions:")
+		LOGGER.debug("\tOptions:")
 		optionsMap.forEach { (k, v) ->
-			LOGGER.lifecycle("\t\t$k = $v")
+			LOGGER.debug("\t\t$k = $v")
 		}
 
 		if (commandLineArgs.isNotEmpty()) {
-			LOGGER.lifecycle("\tCommand Line Args:")
+			LOGGER.debug("\tCommand Line Args:")
 			commandLineArgs.forEach { arg ->
-				LOGGER.lifecycle("\t\t$arg")
+				LOGGER.debug("\t\t$arg")
 			}
 		}
 
