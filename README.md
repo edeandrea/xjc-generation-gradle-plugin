@@ -1,7 +1,9 @@
 ![](https://github.com/edeandrea/xjc-generation-gradle-plugin/workflows/Build%20app/badge.svg)
 
 # xjc-generation-gradle-plugin
-A Gradle Plugin for generating JAXB Java sources using the XJC compiler. Under the covers uses the [XJC Ant Task](https://javaee.github.io/jaxb-v2/doc/user-guide/ch04.html#tools-xjc-ant-task).
+A Gradle Plugin for generating JAXB Java sources using the XJC compiler. Under the covers uses the [XJC Ant Task](https://javaee.github.io/jaxb-v2/doc/user-guide/ch04.html#tools-xjc-ant-task) by default.
+
+As of version 1.6, the task class can be overridden in the `xjcTaskClassName` attribute of the `xjcGeneration` block (see [configuration DSL documentation below](#configuration-dsl)). One such example would be to use the [jaxb2-basics project](https://github.com/highsource/jaxb2-basics) instead of the default one mentioned previously. [See the notes](https://github.com/edeandrea/xjc-generation-gradle-plugin/issues/24) for details.
 
 This plugin offers a flexible approach for allowing JAXB source generation using the XJC compiler. The core concept is to allow configuration of dependencies specific to the classpath of the XJC compiler while allowing the generated sources to end up in any particular `sourceSet` that the project may define.
 
@@ -11,14 +13,14 @@ You can use the `plugins` closure
 **Groovy**
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.5'
+  id 'com.github.edeandrea.xjc-generation' version '1.6'
 }
 ```
 
 **Kotlin**
 ```kotlin
 plugins {
-  id("com.github.edeandrea.xjc-generation") version "1.5"
+  id("com.github.edeandrea.xjc-generation") version "1.6"
 }
 ```
 
@@ -37,6 +39,7 @@ dependencies {
   xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
   xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
   xjc 'javax.activation:activation:1.1.1'
+  // Plus any other additional libraries you may need on the xjc compilation classpath
 }
 ```
 
@@ -50,6 +53,7 @@ dependencies {
   xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
   xjc "org.glassfish.jaxb:jaxb-runtime:$jaxbVersion"
   xjc "org.glassfish.jaxb:jaxb-xjc:$jaxbVersion"
+  // Plus any other additional libraries you may need on the xjc compilation classpath
 }
 ```
 
@@ -63,6 +67,7 @@ dependencies {
   "xjc"("com.sun.xml.bind:jaxb-xjc:$jaxbVersion")
   "xjc"("com.sun.xml.bind:jaxb-core:$jaxbVersion")
   "xjc"("javax.activation:activation:1.1.1")
+  // Plus any other additional libraries you may need on the xjc compilation classpath
 }
 ```
 
@@ -74,14 +79,17 @@ dependencies {
   "xjc"("javax.xml.bind:jaxb-api:$jaxbVersion")
   "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
   "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
+  // Plus any other additional libraries you may need on the xjc compilation classpath
 }
 ```
 
+## Configuration DSL
 Once that's done you can configure the `xjcGeneration` DSL as shown below. All the configuration options are shown with their default values.
 
 **Groovy**
 ```groovy
 xjcGeneration {
+  xjcTaskClassName = 'com.sun.tools.xjc.XJCTask' // The fully-qualified class name for the ant task to use. Available since version 1.6.
   defaultBindingFile = null  // A File reference to a default binding file to be used for all schemas
   defaultSourceSet = 'main'  // The default sourceSet for all schemas to be generated from
   defaultAdditionalXjcOptions = [:]  // A Map containing additional options to pass to xjc for all schemas. If the option doesn't have a value, then use the empty string as a value. Available since version 1.2.
@@ -111,6 +119,7 @@ xjcGeneration {
 **Kotlin**
 ```kotlin
 xjcGeneration {
+  xjcTaskClassName = "com.sun.tools.xjc.XJCTask"
   defaultBindingFile = null
   defaultSourceSet = "main"
   defaultAdditionalXjcOptions = mapOf()
@@ -143,7 +152,7 @@ For each individual schema, the generation of that schema will happen prior to t
 **Groovy** `build.gradle` file
 ```groovy
 plugins {
-  id 'com.github.edeandrea.xjc-generation' version '1.5'
+  id 'com.github.edeandrea.xjc-generation' version '1.6'
 }
 
 ext {
@@ -210,7 +219,7 @@ xjcGeneration {
 **Kotlin** `build.gradle.kts` file
 ```kotlin
 plugins {
-  id("com.github.edeandrea.xjc-generation") version "1.5"
+  id("com.github.edeandrea.xjc-generation") version "1.6"
 }
 
 val jaxbVersion by extra { "2.2.11" }

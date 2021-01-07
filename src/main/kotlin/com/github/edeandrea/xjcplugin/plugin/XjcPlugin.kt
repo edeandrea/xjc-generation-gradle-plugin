@@ -72,6 +72,7 @@ class XjcPlugin : Plugin<Project> {
 			}
 
 			val taskName = getTaskName(schema)
+			val xjcTaskClassName = xjcExtension.xjcTaskClassName
 			val sourceSetName = schema.sourceSet ?: xjcExtension.defaultSourceSet
 			val sourceSet = sourceSets.getByName(sourceSetName)
 			val schemaRootDir = schema.schemaRootDir ?: "${project.projectDir}/src/$sourceSetName/schemas/xjc"
@@ -86,6 +87,7 @@ class XjcPlugin : Plugin<Project> {
 			if (log.isInfoEnabled) {
 				log.info("------------------------------------------")
 				log.info("taskName = $taskName")
+				log.info("antTaskClassName = $xjcTaskClassName")
 				log.info("sourceSetName = $sourceSetName")
 				log.info("schemaRootDir = $schemaRootDir")
 				log.info("onePassMode = $onePassMode")
@@ -103,6 +105,7 @@ class XjcPlugin : Plugin<Project> {
 
 			val xjcTask = project.tasks.create(taskName, Xjc::class.java) {
 				it.description = taskDesc
+				it.xjcTaskClassName = xjcTaskClassName
 				it.onePassMode = onePassMode
 				it.schemaFiles = schemaFiles
 				it.schemaRootDir = project.file(schemaRootDir)

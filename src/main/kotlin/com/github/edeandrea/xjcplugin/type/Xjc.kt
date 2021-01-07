@@ -111,6 +111,13 @@ open class Xjc : DefaultTask() {
 	@Optional
 	lateinit var additionalXjcCommandLineArgs: Map<String, String>
 
+	/**
+	 * The fully-qualified ant task name to execute
+	 * @since 1.6
+	 */
+	@Input
+	lateinit var xjcTaskClassName: String
+
 	private var xjcTaskAlreadyCreated = false
 
 	private fun validateProperties() {
@@ -138,7 +145,7 @@ open class Xjc : DefaultTask() {
 			ant.withGroovyBuilder {
 				"taskdef"(
 					"name" to "xjc",
-					"classname" to "com.sun.tools.xjc.XJCTask",
+					"classname" to xjcTaskClassName,
 					"classpath" to project.configurations.getByName("xjc").asPath
 				)
 			}

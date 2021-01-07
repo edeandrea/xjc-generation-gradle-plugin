@@ -3,7 +3,8 @@ plugins {
 }
 
 ext {
-	jaxbVersion = '2.2.11'
+	jaxbVersion = '2.3.1'
+	jaxb2CommonsVersion = '1.11.1'
 }
 
 repositories {
@@ -12,10 +13,12 @@ repositories {
 
 dependencies {
 	xjc "javax.xml.bind:jaxb-api:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-xjc:$jaxbVersion"
-	xjc "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+	xjc "org.glassfish.jaxb:jaxb-runtime:$jaxbVersion"
+	xjc "org.glassfish.jaxb:jaxb-xjc:$jaxbVersion"
+	xjc "org.jvnet.jaxb2_commons:jaxb2-basics:$jaxb2CommonsVersion"
+	xjc "org.jvnet.jaxb2_commons:jaxb2-basics-ant:$jaxb2CommonsVersion"
 	xjc 'javax.activation:activation:1.1.1'
+	xjc "org.slf4j:slf4j-simple:1.7.30"
 }
 
 sourceSets {
@@ -24,6 +27,7 @@ sourceSets {
 
 xjcGeneration {
 	defaultBindingFile = file 'src/main/schemas/xjc/xjc.xjb.xml'
+	xjcTaskClassName = 'org.jvnet.jaxb2_commons.xjc.XJC2Task'
 
 	schemas {
 		maven {

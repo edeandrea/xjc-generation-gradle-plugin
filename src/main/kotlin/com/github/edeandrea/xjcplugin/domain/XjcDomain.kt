@@ -56,6 +56,12 @@ open class XjcExtension(project: Project) {
 	var schemas: NamedDomainObjectContainer<Schema> = project.container(Schema::class.java)
 
 	/**
+	 * The fully-qualified ant task name to execute. Defaults to <code>com.sun.tools.xjc.XJCTask</code>.
+	 * @since 1.6
+	 */
+	var xjcTaskClassName: String = "com.sun.tools.xjc.XJCTask"
+
+	/**
 	 * Configuration of each [Schema]
 	 */
 	fun schemas(configureClosure: Closure<Schema>) = this.schemas.configure(configureClosure)

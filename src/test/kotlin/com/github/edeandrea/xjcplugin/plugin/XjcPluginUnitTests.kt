@@ -98,6 +98,48 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 	}
 
 	@Test
+	fun `xjcGeneration extension default ant task name set`() {
+		val schema = Schema("someSchema")
+		schema.schemaFile = "some-schema.xsd"
+		schema.javaPackageName = "some.package"
+
+		val project = createProject()
+		addSchemas(project, schema)
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks.size).isEqualTo(1)
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("xjcTaskClassName")
+			.isEqualTo("com.sun.tools.xjc.XJCTask")
+	}
+
+	@Test
+	fun `xjcGeneration extension allows overriding ant task name`() {
+		val schema = Schema("someSchema")
+		schema.schemaFile = "some-schema.xsd"
+		schema.javaPackageName = "some.package"
+
+		val project = createProject()
+		addSchemas(project, schema)
+
+		val xjcExtension = project.extensions.getByType(XjcExtension::class.java)
+		xjcExtension.xjcTaskClassName = "org.jvnet.jaxb2_commons.xjc.XJC2Task"
+
+		runProjectAfterEvaluate(project)
+
+		val xjcTasks = getXjcTasks(project)
+
+		assertThat(xjcTasks.size).isEqualTo(1)
+		assertThat(xjcTasks.first())
+			.isNotNull()
+			.extracting("xjcTaskClassName")
+			.isEqualTo("org.jvnet.jaxb2_commons.xjc.XJC2Task")
+	}
+
+	@Test
 	fun `xjcGeneration extension configures properly`() {
 		val schema = Schema("someSchema")
 		schema.schemaFile = "some-schema.xsd"
