@@ -508,8 +508,7 @@ internal class XjcPluginUnitTests : AbstractUnitTests() {
 
 		assertThat(expectedCompileTask.dependsOn)
 			.isNotEmpty()
-			.hasSize(1)
-			.containsOnly(firstTask)
+			.contains(firstTask)
 	}
 
 	fun compileTaskDependencies() =
