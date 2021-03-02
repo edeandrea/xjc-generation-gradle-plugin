@@ -2,10 +2,10 @@ name: Build app
 on:
   push:
     branches: 
-      - master
+      - main
   pull_request:
     branches: 
-      - master
+      - main
 jobs:
   build-jdk8:
     runs-on: ubuntu-latest
