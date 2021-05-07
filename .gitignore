@@ -40,6 +40,7 @@
 .idea/misc.xml
 .idea/modules.xml
 .idea/terminal.xml
+.idea/libraries-with-intellij-classes.xml
 
 # CMake
 cmake-build-debug/

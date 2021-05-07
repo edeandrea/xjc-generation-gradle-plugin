@@ -65,8 +65,8 @@ idea {
 	module {
 		isDownloadJavadoc = true
 		isDownloadSources = true
-		testSourceDirs.addAll(sourceSets["intTest"].allSource.srcDirs)
-		testResourceDirs.addAll(sourceSets["intTest"].resources.srcDirs)
+		testSourceDirs = testSourceDirs + sourceSets["intTest"].allSource.srcDirs
+		testResourceDirs = testResourceDirs + sourceSets["intTest"].resources.srcDirs
 		val testScope = scopes["TEST"]
 
 		if (testScope != null) {
