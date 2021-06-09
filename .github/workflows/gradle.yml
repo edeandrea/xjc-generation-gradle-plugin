@@ -21,7 +21,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew clean build
   build-jdk11:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     name: Build on Java 11
     steps:
       - uses: actions/checkout@v1
@@ -31,5 +31,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Build with Gradle
+        run: ./gradlew clean build
+  build-jdk16:
+    runs-on: ubuntu-latest
+    name: Build on Java 16
+    steps:
+      - uses: actions/checkout@v1
+      - uses: gradle/wrapper-validation-action@v1
+        name: Validate Gradle Wrapper
+      - name: Set up JDK 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
       - name: Build with Gradle
         run: ./gradlew clean build
